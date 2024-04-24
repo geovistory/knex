@@ -29,13 +29,6 @@ def extract_birth(doc: Doc) -> None:
         geoplaces_spans = list(filter(lambda ent: ent.label_ == "GPE", span.ents))
         dates_spans = list(filter(lambda ent: ent.label_ == "DATE", span.ents))
 
-        if params.debug:
-            print('== Birth Extraction ==')
-            print(f' --> Matching: {span.text}')
-            print(f' --> Persons: {persons_spans}')
-            print(f' --> Geoplaces: {geoplaces_spans}')
-            print(f' --> Dates: {dates_spans}')
-
         # Error detection
         if len(persons_spans) != 1 or len(geoplaces_spans) > 1 or len(dates_spans) > 1:
             print(f'Impossible to parse BIRTH:')
@@ -44,6 +37,10 @@ def extract_birth(doc: Doc) -> None:
             print(f' --> Geoplaces: {geoplaces_spans}')
             print(f' --> Dates: {dates_spans}')
             return doc
+        
+        # Logs
+        if params.debug or 'birth' in params.debug_list:
+            print(f'> Birth found: {persons_spans[0].text} (PERSON), {geoplaces_spans[0].text if len(geoplaces_spans) > 0 else None} (GPE), {dates_spans[0].text if len(dates_spans) > 0 else None} (DATE)')
 
         # Get the Person, and link it to a Birth
         pk_person = graph.create_entity(class_E21_person, span=persons_spans[0], is_orphan=False)

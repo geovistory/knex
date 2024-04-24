@@ -1,8 +1,9 @@
+from typing import List
 import pandas as pd
 from pyvis.network import Network
 from gmpykit import wrap
 from .globals import nlp, graph, params
-from .model import Params, Response
+from .model import Response
 from .components import *
 from .graphs import *
 from .constants import colors
@@ -11,6 +12,7 @@ from .llm import build_prompt, ask_ollama
 
 def init(
         debug = False,
+        debug_list: List[str] = [],
         ask_llm = True,
         ollama_url = 'http://localhost:11434/api/generate',
         llm_name = 'mistral',
@@ -18,6 +20,7 @@ def init(
         visual_path = './graph.html'
     ):
     params.debug = debug
+    params.debug_list = debug_list
     params.ask_llm = ask_llm
     params.ollama_url = ollama_url
     params.llm_name = llm_name
@@ -35,12 +38,13 @@ def run(input_text: str) -> pd.DataFrame:
     # Get LLM understanding of the input text
         if params.debug: print('\033[1m[KNEX] > Assertions:\033[0m')
     if params.ask_llm: assertions = structure_data(input_text)
-    else: assertions = list(map(lambda sentence: sentence.text, nlp(input_text).sents))
+    else: assertions = list(map(lambda sentence: sentence.text.strip(), nlp(input_text).sents))
     if params.debug: [print(assertion.strip()) for assertion in assertions]
 
     # Extract Knowledge graph from assertions
-    if params.debug: print('\033[1m[KNEX] > Extracted data:\033[0m')
+    print('\033[1m[KNEX] > Extract data from assertions:\033[0m')
     for doc in nlp.pipe(assertions):
+        if params.debug: print(f'\033[1m[KNEX] > from "{doc.text}"\033[0m')
         graph.extract(doc)
 
     # Add usefull information for the graph

@@ -12,8 +12,8 @@ def extract_person(doc: Doc) -> None:
     # Create wanted entities (doc._.entities)
     for span in persons_spans:
 
-        if params.debug:
-            print(f'> Person found: {span.text}')
+        if params.debug or 'person' in params.debug_list:
+            print(f'> Person found: {span.text} (PERSON)')
 
         pk_person = graph.create_entity(class_E21_person, span=span)
         person = graph.get_entity(pk_person)

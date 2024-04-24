@@ -1,8 +1,13 @@
+from typing import List
+
 
 class Params:
 
     # Whether or not print debug logs
     debug: bool
+    
+    # If developer only wants to debug some parts
+    debug_list: List[str]
 
     # Whether or not ask the LLM to reparse the input string
     ask_llm: bool
