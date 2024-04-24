@@ -43,12 +43,29 @@ def run(input_text: str) -> pd.DataFrame:
 
     # Extract Knowledge graph from assertions
     print('\033[1m[KNEX] > Extract data from assertions:\033[0m')
+    feedbacks = []
     for doc in nlp.pipe(assertions):
         if params.debug: print(f'\033[1m[KNEX] > from "{doc.text}"\033[0m')
         graph.extract(doc)
 
+        # For feedback
+        text_ = list(map(lambda token: token.text, doc))
+        for ent in doc.ents:
+            if ent._.is_orphan:
+                for i in range(ent.start, ent.end):
+                    text_[i] = '\033[4m' + text_[i] + '\033[0m'
+            for i in range(ent.start, ent.end):
+                text_[i] = '\x1B[3m\033[1m' + text_[i] + '\033[0m\x1B[0m' + f' ({ent.label_})' 
+        feedbacks.append(' '.join(text_))
+    feedbacks = '\n'.join(feedbacks)
+
+    if params.debug:
+        print('\033[1m[KNEX] > Feedback text\033[0m')
+        print('\n' + feedbacks + '\n')
+
+
     # Add usefull information for the graph
-    graph_df = widen_graph()
+    graph_df = widen_graph()    
     if params.debug: 
         print('\033[1m[KNEX] > Graph dataframe:\033[0m')
         print(graph_df)
@@ -56,7 +73,7 @@ def run(input_text: str) -> pd.DataFrame:
     # Generate the visual
     if params.visual: generate_visual(graph_df, params.visual_path)
 
-    return Response(input_text, assertions, graph_df)
+    return Response(input_text, assertions, graph_df, feedbacks)
     
 
 
