@@ -1,4 +1,5 @@
 import requests, json
+from .globals import params
 
 prompt = """
 Provide me all statements you understand from the following text. 
@@ -22,8 +23,8 @@ def build_prompt(input_text):
     return prompt.replace('[INPUT_TEXT]', input_text)
 
 
-def ask_ollama(url, model, prompt):
-    response = requests.post(url, json={'model':model,'prompt':prompt, 'option':{'temperature':0}})
+def ask_ollama(prompt):
+    response = requests.post(params.ollama_url, json={'model': params.llm_name, 'prompt': prompt, 'option': {'temperature': 0}})
     text = response.text.strip()
     lines = text.split('\n')
     tokens = list(map(lambda line: json.loads(line)['response'], lines))

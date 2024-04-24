@@ -1,6 +1,7 @@
 import spacy
 from spacy.tokens import Span, Token
 from .model.graph import Graph
+from .model.params import Params
 
 
 # Extend spaCy objects
@@ -19,3 +20,7 @@ nlp.add_pipe('merge_noun_chunks')
 # Knex graph object which contains all info needed from extrated information.
 # It is extended in the knex/graphs folder
 graph = Graph()
+
+
+# Global parameters
+params = Params()

@@ -1,73 +1,64 @@
-from typing import Dict
 import pandas as pd
 from pyvis.network import Network
-from .globals import nlp, graph
+from gmpykit import wrap
+from .globals import nlp, graph, params
+from .model import Params, Response
 from .components import *
 from .graphs import *
-from .constants.colors import colors
+from .constants import colors
 from .llm import build_prompt, ask_ollama
-from .model.response import Response
-from gmpykit import wrap
-
-# For the Ollama server
-glo_ollama_url = 'http://localhost:11434/api/generate'
-glo_ollama_model_name = 'mistral'
-
-# For convenience
-glo_debug = False
-glo_visual = False
-glo_visual_path = './graph.html'
-glo_ask_llm = True
 
 
-def init(ollama_url: str = None, ollama_model_name: str = None, debug: bool = False, visual: bool = False, visual_path: str = './graph.html', ask_llm: bool = True):
-    global glo_ollama_url, glo_ollama_model_name
-    global glo_debug, glo_visual, glo_visual_path, glo_ask_llm
-
-    if ollama_url: glo_ollama_url = ollama_url
-    if ollama_model_name: glo_ollama_model_name = ollama_model_name
-    glo_debug = debug
-    glo_visual = visual
-    glo_visual_path = visual_path
-    glo_ask_llm = ask_llm
+def init(
+        debug = False,
+        ask_llm = True,
+        ollama_url = 'http://localhost:11434/api/generate',
+        llm_name = 'mistral',
+        visual = False,
+        visual_path = './graph.html'
+    ):
+    params.debug = debug
+    params.ask_llm = ask_llm
+    params.ollama_url = ollama_url
+    params.llm_name = llm_name
+    params.visual = visual
+    params.visual_path = visual_path
 
 
 def run(input_text: str) -> pd.DataFrame:
-    global glo_debug, glo_visual, glo_visual_path, glo_ask_llm
+    input_text = input_text.strip()
 
-    if glo_debug: 
+    if params.debug: 
         print('\033[1m[KNEX] > Input text:\033[0m')
         print(wrap(input_text, length=100))
 
     # Get LLM understanding of the input text
-        if glo_debug: print('\033[1m[KNEX] > Assertions:\033[0m')
-    if glo_ask_llm: assertions = structure_data(input_text)
+        if params.debug: print('\033[1m[KNEX] > Assertions:\033[0m')
+    if params.ask_llm: assertions = structure_data(input_text)
     else: assertions = list(map(lambda sentence: sentence.text, nlp(input_text).sents))
-    if glo_debug: [print(assertion.strip()) for assertion in assertions]
+    if params.debug: [print(assertion.strip()) for assertion in assertions]
 
     # Extract Knowledge graph from assertions
-    if glo_debug: print('\033[1m[KNEX] > Extracted data:\033[0m')
+    if params.debug: print('\033[1m[KNEX] > Extracted data:\033[0m')
     for doc in nlp.pipe(assertions):
         graph.extract(doc)
 
     # Add usefull information for the graph
     graph_df = widen_graph()
-    if glo_debug: 
+    if params.debug: 
         print('\033[1m[KNEX] > Graph dataframe:\033[0m')
         print(graph_df)
 
     # Generate the visual
-    if glo_visual: generate_visual(graph_df, glo_visual_path)
+    if params.visual: generate_visual(graph_df, params.visual_path)
 
     return Response(input_text, assertions, graph_df)
     
 
 
 def structure_data(input_text: str) -> str:
-    global glo_ollama_url, glo_ollama_model_name
-
     prompt = build_prompt(input_text)
-    llm_answer = ask_ollama(glo_ollama_url, glo_ollama_model_name, prompt)
+    llm_answer = ask_ollama(prompt)
 
     assertions = [line[line.find(' ') + 1:] for line in llm_answer.split('\n')]
 

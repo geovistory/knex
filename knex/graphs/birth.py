@@ -1,7 +1,7 @@
 from spacy.matcher import Matcher
 from spacy.tokens import Doc
 from ..constants.ontology import *
-from ..globals import nlp, graph
+from ..globals import nlp, graph, params
 from .date import link_date
 
 matcher = Matcher(nlp.vocab)
@@ -29,7 +29,7 @@ def extract_birth(doc: Doc) -> None:
         geoplaces_spans = list(filter(lambda ent: ent.label_ == "GPE", span.ents))
         dates_spans = list(filter(lambda ent: ent.label_ == "DATE", span.ents))
 
-        if graph.debug_mode:
+        if params.debug:
             print('== Birth Extraction ==')
             print(f' --> Matching: {span.text}')
             print(f' --> Persons: {persons_spans}')

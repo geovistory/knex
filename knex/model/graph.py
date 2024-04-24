@@ -14,10 +14,7 @@ class Graph:
         self.pk_index = 0
 
         self.functions: List[function] = []
-
-
-    def debug_mode(self, switch: bool = False) -> None:
-        self.debug = switch
+        self.debug = False
 
 
     def create_entity(
