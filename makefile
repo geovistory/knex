@@ -11,9 +11,9 @@ build:
 install-local:
 	pip install -e .
 	
-push:
+save:
 	git add .
-	git commit -m "update"
+	git commit -m "save"
 	git push origin master
 
 install: clean build install

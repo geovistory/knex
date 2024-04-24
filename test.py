@@ -16,9 +16,4 @@ Cajetan Tschudi was sent to Vienna and Constantinople
 Cajetan Tschudi received the title of count napolitain in 1846.
 """
 
-entities, graph = knex.extract_graph(text)
-
-# print(entities[['label']])
-# print(graph[['subject_label', 'property', 'object_label']])
-
-knex.show_graph(graph)
+knex.run(text, visual=True, debug=True)

@@ -1,32 +1,37 @@
-from ..globals import nlp
-from ..tools import add_triple, get_entity
-from spacy.matcher import PhraseMatcher, Matcher
+from spacy.matcher import PhraseMatcher
 from spacy.language import Language
-from spacy.tokens import Span
+from spacy.tokens import Span, Doc
+from ..main import nlp
 
 white_list = ['catholic', 'protestant']
 black_list = []
 
-entity_matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
-entity_matcher.add('RELIGION', list(nlp.pipe(white_list)))
+matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
+matcher.add('RELIGION', list(nlp.pipe(white_list)))
 
-pattern_matcher = Matcher(nlp.vocab)
-patterns = [
 
-]
-pattern_matcher.add('HAS_RELIGION', patterns)
+@Language.component('ner_religion')
+def ner_religion(doc: Doc) -> Doc:
 
-@Language.component('knex_religion_component')
-def knex_religion_component(doc):
+    # This is a new entity label. 
+    # So first, we need to remove those found as something else who could match either white or black list.
+    # This is it because entities in spaCy can not have multiple labels
 
     # Remove all already listed and found (white and black) entities
     doc.ents = list(filter(lambda ent: ent.text.lower() not in white_list and ent.text.lower() not in black_list, doc.ents))
+    # doc.ents = list(filter(lambda ent: ent.lemma_ not in white_list and ent.lemma_ not in black_list, doc.ents))
 
     # Add as entity all whitelisted entity
-    religions = [Span(doc, start, end, label='RELIGION') for _, start, end in entity_matcher(doc)]
+    religions = [Span(doc, start, end, label='RELIGION') for _, start, end in matcher(doc)]
+
+    # print('== RELIGION NER ==')
+    # for religion in religions:
+    #     print('Religion found:', religion.text, religion.label_)
+    
+    # Add new entities
     doc.ents = list(doc.ents) + religions
 
     return doc
 
 
-nlp.add_pipe('knex_religion_component')
+nlp.add_pipe('ner_religion', before='merge_entities')
