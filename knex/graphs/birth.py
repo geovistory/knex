@@ -30,7 +30,7 @@ def extract_birth(doc: Doc) -> None:
         dates_spans = list(filter(lambda ent: ent.label_ == "DATE", span.ents))
 
         if graph.debug_mode:
-            print('== Birth component ==')
+            print('== Birth Extraction ==')
             print(f' --> Matching: {span.text}')
             print(f' --> Persons: {persons_spans}')
             print(f' --> Geoplaces: {geoplaces_spans}')
