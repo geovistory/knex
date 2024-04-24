@@ -45,7 +45,7 @@ def run(input_text: str) -> pd.DataFrame:
     print('\033[1m[KNEX] > Extract data from assertions:\033[0m')
     feedbacks = []
     for doc in nlp.pipe(assertions):
-        if params.debug: print(f'\033[1m[KNEX] > from "{doc.text}"\033[0m')
+        if params.debug or len(params.debug_list) > 0: print(f'\033[1m[KNEX] > from "{doc.text}"\033[0m')
         graph.extract(doc)
 
         # For feedback

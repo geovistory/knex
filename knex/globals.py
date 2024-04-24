@@ -1,7 +1,6 @@
 import spacy
 from spacy.tokens import Span, Token
-from .model.graph import Graph
-from .model.params import Params
+from .model import Graph, Params
 
 
 # Extend spaCy objects

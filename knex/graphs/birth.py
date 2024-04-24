@@ -9,11 +9,11 @@ patterns = [
     # PERSON be born in GPE
     [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}],
     # PERSON be born on DATE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'DATE'}],
+    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'ENT_TYPE': 'DATE'}],
     # PERSON be born on DATE in GPE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'DATE'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}],
+    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'ENT_TYPE': 'DATE'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}],
     # PERSON be born in GPE on DATE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'DATE'}],
+    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}, {'ENT_TYPE': 'DATE'}],
 ]
 matcher.add('HAS_BIRTH', patterns)
 
