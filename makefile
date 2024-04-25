@@ -14,7 +14,7 @@ install-local:
 save:
 	@git add .
 	@git commit -m "save with make command"
-	@git push origin master
+	@git push origin main
 
 install: clean build install
 
