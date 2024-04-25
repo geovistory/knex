@@ -5,9 +5,9 @@ from .model import Graph, Params
 
 # Extend spaCy objects
 Span.set_extension('pk_entity', default=-1)
-Span.set_extension('is_orphan', default=True)
+Span.set_extension('linked', default=False)
 Token.set_extension('pk_entity', default=-1)
-Token.set_extension('is_orphan', default=True)
+Token.set_extension('linked', default=False)
 
 
 # Spacy NLP object which components list is extended in the knex/components folder

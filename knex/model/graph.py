@@ -22,7 +22,7 @@ class Graph:
             pk_class: int,
             text: str = None,
             span: Span = None,
-            is_orphan: bool = True
+            linked: bool = False
         ) -> int:
         """Create or get an existing entity based on given information."""
 
@@ -34,7 +34,7 @@ class Graph:
         same = list(filter(lambda entity: entity.pk_class == pk_class and entity.label == label, self.entities))
 
         # Save the orphan fact in the doc directly
-        if span and span._.is_orphan: span._.is_orphan = is_orphan
+        if span and span._.linked: span._.linked = linked
         
         # If one is found, returns it (and set meta information)
         if len(same) == 1:

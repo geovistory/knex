@@ -1,60 +1,122 @@
-from spacy.matcher import Matcher
+from spacy.matcher import DependencyMatcher
 from spacy.tokens import Doc
 from ..constants.ontology import *
 from ..globals import nlp, graph, params
 from .date import link_date
 
-matcher = Matcher(nlp.vocab)
-patterns = [
-    # PERSON be born in GPE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}],
-    # PERSON be born on DATE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'ENT_TYPE': 'DATE'}],
-    # PERSON be born on DATE in GPE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'ENT_TYPE': 'DATE'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}],
-    # PERSON be born in GPE on DATE
-    [{'ENT_TYPE': 'PERSON'}, {'LEMMA': 'be'}, {'TEXT': 'born'}, {'LEMMA': {'IN': ['in', 'on']}}, {'ENT_TYPE': 'GPE'}, {'ENT_TYPE': 'DATE'}],
+
+matcher = DependencyMatcher(nlp.vocab)
+pattern_person = [
+    {'RIGHT_ID': 'born', 'RIGHT_ATTRS': {'TEXT': 'born'}},
+    {'RIGHT_ID': 'person', 'RIGHT_ATTRS': {'ENT_TYPE': 'PERSON'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
 ]
-matcher.add('HAS_BIRTH', patterns)
+pattern_person_date = [
+    {'RIGHT_ID': 'born', 'RIGHT_ATTRS': {'TEXT': 'born'}},
+    {'RIGHT_ID': 'person', 'RIGHT_ATTRS': {'ENT_TYPE': 'PERSON'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+    {'RIGHT_ID': 'date', 'RIGHT_ATTRS': {'ENT_TYPE': 'DATE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+]
+pattern_person_place = [
+    {'RIGHT_ID': 'born', 'RIGHT_ATTRS': {'TEXT': 'born'}},
+    {'RIGHT_ID': 'person', 'RIGHT_ATTRS': {'ENT_TYPE': 'PERSON'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+    {'RIGHT_ID': 'date', 'RIGHT_ATTRS': {'ENT_TYPE': 'GPE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+]
+pattern_person_date_place = [
+    {'RIGHT_ID': 'born', 'RIGHT_ATTRS': {'TEXT': 'born'}},
+    {'RIGHT_ID': 'person', 'RIGHT_ATTRS': {'ENT_TYPE': 'PERSON'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+    {'RIGHT_ID': 'date', 'RIGHT_ATTRS': {'ENT_TYPE': 'DATE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+    {'RIGHT_ID': 'geoplace', 'RIGHT_ATTRS': {'ENT_TYPE': 'GPE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+]
+matcher.add('birth_person', [pattern_person])
+matcher.add('birth_person_date', [pattern_person_date])
+matcher.add('birth_person_date_place', [pattern_person_date_place])
+
+# matcher.add("birth", [pattern_person, pattern_person_date, pattern_person_date_place])
 
 
-def extract_birth(doc: Doc) -> None:
+def extract_birth(doc):
 
     matchings = matcher(doc)
-    for _, start, end in matchings:
+    for match_id, indexes in matchings:
 
-        # Extract NER from the span
-        span = doc[start:end]
-        persons_spans = list(filter(lambda ent: ent.label_ == "PERSON", span.ents))
-        geoplaces_spans = list(filter(lambda ent: ent.label_ == "GPE", span.ents))
-        dates_spans = list(filter(lambda ent: ent.label_ == "DATE", span.ents))
+        # If we only have the birth of a person
+        if nlp.vocab.strings[match_id] == 'birth_person':
 
-        # Error detection
-        if len(persons_spans) != 1 or len(geoplaces_spans) > 1 or len(dates_spans) > 1:
-            print(f'Impossible to parse BIRTH:')
-            print(f' --> Matching: {span.text}')
-            print(f' --> Persons: {persons_spans}')
-            print(f' --> Geoplaces: {geoplaces_spans}')
-            print(f' --> Dates: {dates_spans}')
-            return doc
-        
-        # Logs
-        if params.debug or 'birth' in params.debug_list:
-            print(f'> Birth found: {persons_spans[0].text} (PERSON), {geoplaces_spans[0].text if len(geoplaces_spans) > 0 else None} (GPE), {dates_spans[0].text if len(dates_spans) > 0 else None} (DATE)')
+            # Logs
+            if params.debug or 'birth' in params.debug_list:
+                print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON)')
 
-        # Get the Person, and link it to a Birth
-        pk_person = graph.create_entity(class_E21_person, span=persons_spans[0], is_orphan=False)
-        pk_birth = graph.create_entity(class_E67_birth, text=persons_spans[0].text)
-        graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
+            # Extract info 
+            person_span = doc[indexes[1]:indexes[1]+1]
 
-        # Birth took place at
-        if len(geoplaces_spans) == 1:
-            pk_geoplace = graph.create_entity(class_C13_geographicalPlace, span=geoplaces_spans[0], is_orphan=False)
+            # Create nodes
+            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
+
+            # Create edges
+            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
+
+
+        # If we have the birth of a person at a date
+        if nlp.vocab.strings[match_id] == 'birth_person_date':
+
+            # Logs
+            if params.debug or 'birth' in params.debug_list:
+                print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (DATE)')
+
+            # Extract info from 
+            person_span = doc[indexes[1]:indexes[1]+1]
+            date_span = doc[indexes[2]:indexes[2]+1]
+
+            # Create nodes
+            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
+
+            # Link nodes
+            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
+            link_date(pk_birth, date_span)
+
+
+        # If we have the birth of a person in a place
+        if nlp.vocab.strings[match_id] == 'birth_person_place':
+
+            # Logs
+            if params.debug or 'birth' in params.debug_list:
+                print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[3]:indexes[3]+1]} (GPE)')
+
+            # Extract info from 
+            person_span = doc[indexes[1]:indexes[1]+1]
+            geoplace_span = doc[indexes[3]:indexes[3]+1]
+
+            # Create nodes
+            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
+            pk_geoplace = graph.create_entity(class_C13_geographicalPlace, span=geoplace_span, linked=True)
+
+            # Link nodes
+            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
             graph.add_triple(pk_birth, property_P6_tookPlaceAt, pk_geoplace)
 
-        # Birth was at some time within
-        if len(dates_spans) == 1:
-            link_date(pk_birth, dates_spans[0])
 
+        # If we have the birth of a person at a date in a place
+        if nlp.vocab.strings[match_id] == 'birth_person_date_place':
+
+            # Logs
+            if params.debug or 'birth' in params.debug_list:
+                print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (DATE), {doc[indexes[3]:indexes[3]+1]} (GPE)')
+
+            # Extract info from 
+            person_span = doc[indexes[1]:indexes[1]+1]
+            date_span = doc[indexes[2]:indexes[2]+1]
+            geoplace_span = doc[indexes[3]:indexes[3]+1]
+
+            # Create nodes
+            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
+            pk_geoplace = graph.create_entity(class_C13_geographicalPlace, span=geoplace_span, linked=True)
+
+            # Link nodes
+            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
+            graph.add_triple(pk_birth, property_P6_tookPlaceAt, pk_geoplace)
+            link_date(pk_birth, date_span)
 
 graph.functions.append(extract_birth)
