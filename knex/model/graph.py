@@ -40,7 +40,7 @@ class Graph:
         same = list(filter(lambda entity: entity.pk_class == pk_class and entity.label == label, self.entities))
 
         # Save the orphan fact in the doc directly
-        if span and span._.linked: span._.linked = linked
+        if span and not span._.linked: span._.linked = linked
         
         # If one is found, returns it (and set meta information)
         if len(same) == 1:

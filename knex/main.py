@@ -60,7 +60,7 @@ def run(input_text: str) -> Response:
                 for i in range(ent.start, ent.end):
                     text_[i] = '\033[4m' + text_[i] + '\033[0m'
             for i in range(ent.start, ent.end):
-                text_[i] = '\x1B[3m\033[1m' + text_[i] + '\033[0m\x1B[0m' + f' ({ent.label_})' 
+                text_[i] = '\033[1m' + text_[i] + '\033[0m' + f' ({ent.label_})' 
         feedbacks.append(' '.join(text_))
     feedbacks = '\n'.join(feedbacks)
     if params.debug or len(params.debug_list) > 0: print('\033[1m==============\033[0m')

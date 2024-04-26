@@ -11,10 +11,15 @@ pattern = [
 matcher.add("THE_NAME", [pattern])
 
 
-def extract_THE_NAME(doc):
+def extract_THE_NAME(doc: Doc) -> None:
 
     matchings = matcher(doc)
     for match_id, indexes in matchings:
+
+        # Logs
+        if params.debug or 'THE_NAME' in params.debug_list:
+            print(f'> ')
+
         pass
 
 graph.functions.append(extract_THE_NAME)

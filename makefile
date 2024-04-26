@@ -32,8 +32,6 @@ new-graph:
 	@echo "Creating graph component at ./knex/graphs/$$name.py"; \
 	sed -e "s/THE_NAME/$$name/g" ./templates/create-graph-component.py > ./knex/graphs/$$name.py; \
 	echo "\nfrom .$$name import *" >> ./knex/graphs/__init__.py; \
-	sed -e "s/THE_NAME/$$name/g" ./templates/create-graph-component-tests.py > ./tests/graphs/$$name.py; \
-	echo "\nfrom .$$name import *" >> ./tests/graphs/__init__.py; \
 	code ./knex/graphs/$$name.py
 
 graph:
@@ -43,4 +41,4 @@ analyze:
 	@python3.12 ./scripts/spacy-analyze-text.py "$$text"
 
 test:
-	@python3.12 ./tests/run.py
+	@python3.12 ./tests/full-graphs.py
