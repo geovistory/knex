@@ -18,19 +18,18 @@ pattern_person_date = [
 pattern_person_place = [
     {'RIGHT_ID': 'born', 'RIGHT_ATTRS': {'TEXT': 'born'}},
     {'RIGHT_ID': 'person', 'RIGHT_ATTRS': {'ENT_TYPE': 'PERSON'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
-    {'RIGHT_ID': 'date', 'RIGHT_ATTRS': {'ENT_TYPE': 'GPE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+    {'RIGHT_ID': 'geoplace', 'RIGHT_ATTRS': {'ENT_TYPE': 'GPE'}, 'REL_OP':'>>', 'LEFT_ID': 'born'},
 ]
 pattern_person_date_place = [
     {'RIGHT_ID': 'born', 'RIGHT_ATTRS': {'TEXT': 'born'}},
     {'RIGHT_ID': 'person', 'RIGHT_ATTRS': {'ENT_TYPE': 'PERSON'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
     {'RIGHT_ID': 'date', 'RIGHT_ATTRS': {'ENT_TYPE': 'DATE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
-    {'RIGHT_ID': 'geoplace', 'RIGHT_ATTRS': {'ENT_TYPE': 'GPE'}, 'REL_OP':'>', 'LEFT_ID': 'born'},
+    {'RIGHT_ID': 'geoplace', 'RIGHT_ATTRS': {'ENT_TYPE': 'GPE'}, 'REL_OP':'>>', 'LEFT_ID': 'born'},
 ]
 matcher.add('birth_person', [pattern_person])
 matcher.add('birth_person_date', [pattern_person_date])
+matcher.add('birth_person_place', [pattern_person_place])
 matcher.add('birth_person_date_place', [pattern_person_date_place])
-
-# matcher.add("birth", [pattern_person, pattern_person_date, pattern_person_date_place])
 
 
 def extract_birth(doc):
@@ -81,11 +80,11 @@ def extract_birth(doc):
 
             # Logs
             if params.debug or 'birth' in params.debug_list:
-                print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[3]:indexes[3]+1]} (GPE)')
+                print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (GPE)')
 
             # Extract info from 
             person_span = doc[indexes[1]:indexes[1]+1]
-            geoplace_span = doc[indexes[3]:indexes[3]+1]
+            geoplace_span = doc[indexes[2]:indexes[2]+1]
 
             # Create nodes
             pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)

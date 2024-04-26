@@ -1,9 +1,12 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 from typing import List
 import pandas as pd
 from pyvis.network import Network
 from gmpykit import wrap
 from .globals import nlp, graph, params
-from .model import Response
+from .model import Response, Graph
 from .components import *
 from .graphs import *
 from .constants import colors
@@ -27,8 +30,10 @@ def init(
     params.visual = visual
     params.visual_path = visual_path
 
+    graph.reset()
 
-def run(input_text: str) -> pd.DataFrame:
+
+def run(input_text: str) -> Response:
     input_text = input_text.strip()
 
     if params.debug: 

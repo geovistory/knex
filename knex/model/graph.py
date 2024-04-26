@@ -16,6 +16,12 @@ class Graph:
         self.functions: List[function] = []
         self.debug = False
 
+    def reset(self):
+        self.pk_index = 0
+        self.entities = []
+        self.triples = []
+        self.keys = set()
+
 
     def create_entity(
             self,
