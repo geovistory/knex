@@ -3,7 +3,7 @@ from spacy.language import Language
 from spacy.tokens import Span, Doc
 from ..main import nlp
 
-white_list = ['catholic', 'protestant']
+white_list = ['catholic', 'protestant', 'chrétien']
 black_list = []
 
 matcher = PhraseMatcher(nlp.vocab, attr='LOWER')

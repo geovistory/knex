@@ -1,14 +1,26 @@
 .DEFAULT_GOAL := help
 
+
 help:
-	@echo "make clean >> Clean ./build, ./dis, ./*.egg-info"
-	@echo "make build >> Build the package, by running setup.py"
-	@echo "make install-local >> Install the previously built package (locally)"
-	@echo "make save >> Git add, commit, push to master"
-	@echo "make new-graph name=graph-component-name >> Create an empty graph component file, ready to be developed"
-	@echo "make graph text=\"This is an example text\" name=person,birth >> Test the full stack on a given text, and debug a list of components"
-	@echo "make analyze text=\"This is an example text\" >> Run a full spaCy analysis on the given text"
-	@echo "make test >> Run all the tests in ./tests/ folder"
+	@echo "\033[1mmake save\033[0m \033[3m-> Git add, commit, push to master (message: 'save with make command')\033[0m"
+	@echo "\033[1mmake install\033[0m \033[3m-> Clean, build and locally install the package\033[0m"
+	@echo "=== dev part ==="
+	@echo "\033[1mmake dev-create-graph-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty graph component file, ready to be developed\033[0m"
+	@echo "\033[1mmake dev-create-ner-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty spaCy NER component file, ready to be developed\033[0m"
+	@echo "\033[1mmake dev-spacy-analyze text=[\"EXAMPLE TEXT\"]\033[0m \033[3m-> Run a spaCy analysis on the given text, usefull for a component's development\033[0m"
+	@echo "\033[1mmake dev-run-all-tests\033[0m \033[3m-> Run all the tests in ./tests/ folder\033[0m"
+	@echo "\033[1mmake dev-knex text=[\"EXAMPLE TEXT\"] explain=[person,birth]\033[0m \033[3m-> Test the library on a given text, and debug a list of components\033[0m"
+
+save:
+	@git add .
+	@git commit -m "save with make command"
+	@git push origin main
+
+
+################################
+####### Package handling #######
+################################
+
 
 clean:
 	@rm -rf ./build
@@ -21,24 +33,31 @@ build:
 install-local:
 	@pip install -e .
 	
-save:
-	@git add .
-	@git commit -m "save with make command"
-	@git push origin main
+install: clean build install-local
 
-install: clean build install
 
-new-graph:
+###############################
+######### Dev helping #########
+###############################
+
+
+dev-create-graph-component:
 	@echo "Creating graph component at ./knex/graphs/$$name.py"; \
-	sed -e "s/THE_NAME/$$name/g" ./templates/create-graph-component.py > ./knex/graphs/$$name.py; \
-	echo "\nfrom .$$name import *" >> ./knex/graphs/__init__.py; \
+	sed -e "s/THE_NAME/$$name/g" ./templates/graph-component.py > ./knex/graphs/$$name.py; \
+	echo -n "\nfrom .$$name import *" >> ./knex/graphs/__init__.py; \
 	code ./knex/graphs/$$name.py
 
-graph:
-	@python3.12 ./scripts/graph-component-test.py "$$text" $$name
+dev-create-ner-component:
+	@echo "Creating NER component at ./knex/spacy_components/$$name.py"; \
+	sed -e "s/THE_NAME/$$name/g" ./templates/ner-spacy-component.py > ./knex/spacy_components/$$name.py; \
+	echo -n "\nfrom .$$name import *" >> ./knex/spacy_components/__init__.py; \
+	code ./knex/spacy_components/$$name.py
 
-analyze:
+dev-spacy-analyze:
 	@python3.12 ./scripts/spacy-analyze-text.py "$$text"
 
-test:
-	@python3.12 ./tests/full-graphs.py
+dev-run-all-tests:
+	@python3.12 ./tests/graphs.py
+
+dev-knex:
+	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain

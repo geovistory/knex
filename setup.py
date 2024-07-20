@@ -10,6 +10,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         "gmpykit",
+        "spacy"
     ],
     keywords=['knowledge', 'extraction', 'graph']
 )

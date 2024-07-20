@@ -7,7 +7,7 @@ from pyvis.network import Network
 from gmpykit import wrap
 from .globals import nlp, graph, params
 from .model import Response, Graph
-from .components import *
+from .spacy_components import *
 from .graphs import *
 from .constants import colors
 from .llm import build_prompt, ask_ollama

@@ -32,7 +32,7 @@ matcher.add('death_person_place', [pattern_person_place])
 matcher.add('death_person_date_place', [pattern_person_date_place])
 
 
-def extract_death(doc):
+def extract_death(doc: Doc) -> None:
 
     matchings = matcher(doc)
     for match_id, indexes in matchings:
@@ -82,7 +82,7 @@ def extract_death(doc):
             if params.debug or 'death' in params.debug_list:
                 print(f'> Death found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (GPE)')
 
-            # Extract info from 
+            # Extract info from matching 
             person_span = doc[indexes[1]:indexes[1]+1]
             geoplace_span = doc[indexes[2]:indexes[2]+1]
 

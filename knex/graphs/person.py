@@ -1,12 +1,16 @@
 from spacy.tokens import Doc
 from ..constants.ontology import *
-from ..globals import graph
+from ..globals import graph, params
 
 
 def extract_person(doc: Doc) -> None:
 
     # Focus on wanted entities
     persons_spans = list(filter(lambda ent: ent.label_ == 'PERSON', doc.ents))
+
+    # Logs
+    if params.debug or 'person' in params.debug_list:
+        print(f'> Person(s) found: {persons_spans}')
 
     # Create person and there name
     for person_span in persons_spans:
