@@ -1,5 +1,4 @@
 from .entity import Entity
 from .graph import Graph
-from .params import Params
-from .response import Response
+from .knowledge_extraction import KnowledgeExtraction
 from .triple import Triple

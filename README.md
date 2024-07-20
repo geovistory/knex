@@ -56,7 +56,14 @@ Structure:
 For usability, and to avoid code duplication, this package depends on *spaCy*, for all the NLP parts, and on *gmpykit* which is the developer personal library for redundant Python code. It is publicly available on Pypi (https://pypi.org/project/gmpykit/)
 
 
-## How to use ?
+## How to use (Library API):
+
+- extract
+- get_assertions
+- generate_visuals
+
+
+
 
 ## How to develop ?
 
@@ -68,10 +75,12 @@ Add a new part of the ontology to the library:
     - Are they new classes that need to be identified in the text (eg. a Religion)? Is this class already parsed, and needs to be complemented (like added in the class white list) or is it new for the library?
     - Is the graph to be build all new? Or can/should it be added to an existing graph? eg: Adding a mother to a birth can be added when parsing the Birth, or when parsing the Person, or even be a new file.
 - Use make tool (`make help`), and focus on `dev` commands
+- Once the right files has been created, development of component/graph extension can start.
+- To help develop those parts, the command `make dev-spacy-analyze text=""` can be usefull: it shows what is available to make NLP on.
+- When the code is written (or in the middle of development) the command `make dev-knex text="" explain="new component"` allows developer to observe the result of the written code, without being poluted with all debugs.
+- Once everything works, a test in the `test` folder needs to be added, to ensure that future development, change of LLM etc will still validate this part.
 
 
-- Tests are made from test text to see if they are correctly knexed
+## Next features
 
-## Next feature
-
-- Completiveness using the feedbacks
+- The library, just before sending the response, could verify, with asking the llm again, if the parsing caught all the information provided in the raw text. if no, it could raise an error, return a error message, or log it in a file to inform developer. This option could be activated or deactivated.

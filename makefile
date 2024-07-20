@@ -61,3 +61,6 @@ dev-run-all-tests:
 
 dev-knex:
 	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain
+
+
+dev-update-ontology:

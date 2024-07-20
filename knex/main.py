@@ -4,56 +4,60 @@ warnings.filterwarnings("ignore")
 from typing import List
 import pandas as pd
 from pyvis.network import Network
-from gmpykit import wrap
+from gmpykit import wrap, cli_bold, cli_italic, cli_underline
 from .globals import nlp, graph, params
-from .model import Response, Graph
+from .model import KnowledgeExtraction
 from .spacy_components import *
 from .graphs import *
-from .constants import colors
-from .llm import build_prompt, ask_ollama
+from .constants import colors, Klass
+from .debug import debug, init_debug
+from .assertions import get_assertions
 
 
-def init(
-        debug = False,
+def extract(
+        text: str,
+        reset_graph: bool = True,
+        compute_assertions: bool = True,
+        ollama_url: str = 'http://localhost:11434/api/generate',
+        model_name: str = 'llama3',
         debug_list: List[str] = [],
-        ask_llm = True,
-        ollama_url = 'http://localhost:11434/api/generate',
-        llm_name = 'mistral',
-        visual = False,
-        visual_path = './graph.html'
     ):
-    params.debug = debug
-    params.debug_list = debug_list
-    params.ask_llm = ask_llm
-    params.ollama_url = ollama_url
-    params.llm_name = llm_name
-    params.visual = visual
-    params.visual_path = visual_path
+    """
+    Extract the knowledge graph from the given text.
 
-    graph.reset()
+    Args:
+    - text (str): the text to extract the graph from.
+    - reset_graph (bool): Start from a clean graph when executing. If this is False, it keeps the latest graph in memory in order to avoid duplicates.
+    - compute_assertions (bool): Whether or not to compute (ask llm) to simplify the initial text.
+    - ollama_url (string): The Ollama server URL the LLM is going to be asked from
+    - model_name (string): which model is going to be queried.
+    - debug_list (List[str]): The list of things to debug, for all, set debug=['all']
+    """
 
-
-def run(input_text: str) -> Response:
+    # init phase
+    if reset_graph: graph.reset()
     input_text = input_text.strip()
+    init_debug(debug_list)
+    feedbacks = []
 
-    if params.debug: 
-        print('\033[1m[KNEX] > Input text:\033[0m')
+    # Display initial text
+    if debug('init'):
+        print(cli_bold('[KNEX] > Input text:'))
         print(wrap(input_text, length=100))
 
-    # Get LLM understanding of the input text
-        if params.debug: print('\033[1m[KNEX] > Assertions:\033[0m')
-    if params.ask_llm: assertions = structure_data(input_text)
+    # Compute assertions or parse them from input text
+    if debug('assertions'): print(cli_bold('[KNEX] > Assertions:'))
+    if compute_assertions: assertions = get_assertions(text, ollama_url, model_name)
     else: assertions = list(map(lambda sentence: sentence.text.strip(), nlp(input_text).sents))
-    if params.debug: [print(assertion.strip()) for assertion in assertions]
+    if debug('assertions'): [print(assertion.strip()) for assertion in assertions]
 
-    # Extract Knowledge graph from assertions
-    if params.debug or len(params.debug_list) > 0: print('\033[1m[KNEX] > Extract data from assertions:\033[0m')
-    feedbacks = []
-    for doc in nlp.pipe(assertions):
-        if params.debug or len(params.debug_list) > 0: print(f'\033[1m>> "{doc.text}"\033[0m')
+    # Extraction
+    if debug('extraction'): print(cli_bold('[KNEX] > Extract data from assertions:'))
+    for doc in nlp.pipe(assertions): # According to spaCy documentation, this is the most efficient way of running pipeline on a string.
+        if debug('extraction'): print(cli_bold(f'>> "{doc.text}"'))
         graph.extract(doc)
 
-        # For feedback
+        # Compute feedbacks
         text_ = list(map(lambda token: token.text, doc))
         for ent in doc.ents:
             if not ent._.linked:
@@ -62,69 +66,22 @@ def run(input_text: str) -> Response:
             for i in range(ent.start, ent.end):
                 text_[i] = '\033[1m' + text_[i] + '\033[0m' + f' ({ent.label_})' 
         feedbacks.append(' '.join(text_))
-    feedbacks = '\n'.join(feedbacks)
-    if params.debug or len(params.debug_list) > 0: print('\033[1m==============\033[0m')
-    
-
-    if params.debug:
-        print('\033[1m[KNEX] > Feedback text\033[0m')
-        print('\n' + feedbacks + '\n')
 
 
-    # Add usefull information for the graph
-    graph_df = widen_graph()    
-    if params.debug: 
-        print('\033[1m[KNEX] > Graph dataframe:\033[0m')
-        print(graph_df)
-
-    # Generate the visual
-    if params.visual: generate_visual(graph_df, params.visual_path)
-
-    return Response(input_text, assertions, graph_df, feedbacks)
-    
-
-
-def structure_data(input_text: str) -> str:
-    prompt = build_prompt(input_text)
-    llm_answer = ask_ollama(prompt)
-
-    assertions = [line[line.find(' ') + 1:] for line in llm_answer.split('\n')]
-
-    return assertions
-
-
-
-def widen_graph() -> pd.DataFrame:
-
-    graph_list = []
-
-    # Populate the graph with usefull information
-    # graph['subject_pk_class'] = pd.NA
-    for triple in graph.triples:
-        subject = graph.get_entity(triple.subject_pk)
-        subject_class = Klass.find(pk=subject.pk_class)
-        property = Property.find(pk=triple.property_pk)
-        object = graph.get_entity(triple.object_pk)
-        object_class = Klass.find(pk=object.pk_class)
-
-        graph_list.append({
-            'subject_pk': subject.pk_entity,
-            'subject_label': f'{subject.label}\n({subject_class.label})',
-            'subject_class_pk': subject_class.pk,
-            'subject_class_label': subject_class.label,
-            'property_pk': property.pk,
-            'property_label': property.label,
-            'object_pk': object.pk_entity,
-            'object_label': f'{object.label}\n({object_class.label})',
-            'object_class_pk': object_class.pk,
-            'object_class_label': object_class.label
-        })
-    
-    return pd.DataFrame(data=graph_list)
+    # Return part
+    return graph.to_dataframe(), '\n'.join(feedbacks)
 
 
 
 def generate_visual(graph: pd.DataFrame, path: str) -> None:
+    """
+    From a graph DataFrame generate a html file with a graph visual
+
+    Args:
+    - graph (pd.DataFrame): A DataFrame whose columns are at least ['subject_pk', 'subject_label', 'subject_class_pk', 'property_label', 'object_class_pk', 'object_pk', 'object_label', ]
+    - path (str): The place were to save the file
+    """
+
 
     if len(graph) == 0: return
 

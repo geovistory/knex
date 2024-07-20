@@ -14,6 +14,3 @@ Examples:
                  
 Text: "[INPUT_TEXT]"
 """
-
-def build_prompt(input_text):
-    return prompt.replace('[INPUT_TEXT]', input_text)

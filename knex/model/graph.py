@@ -2,6 +2,8 @@ from typing import List, Set
 from spacy.tokens import Span, Doc
 from .entity import Entity
 from .triple import Triple
+import pandas as pd
+from knex.constants import Klass, Property
 
 
 class Graph:
@@ -15,6 +17,7 @@ class Graph:
 
         self.functions: List[function] = []
         self.debug = False
+
 
     def reset(self):
         self.pk_index = 0
@@ -30,7 +33,7 @@ class Graph:
             span: Span = None,
             linked: bool = False
         ) -> int:
-        """Create or get an existing entity based on given information."""
+        """Create or get (pk) an existing entity based on given information."""
 
         # Get the entity label
         if text: label = text.title()
@@ -84,3 +87,32 @@ class Graph:
     def extract(self, doc: Doc) -> None:
         for function in self.functions:
             function(doc)
+
+
+    def to_dataframe(self) -> pd.DataFrame:
+
+        graph_list = []
+
+        # Populate the graph with usefull information
+        # graph['subject_pk_class'] = pd.NA
+        for triple in self.triples:
+            subject = self.get_entity(triple.subject_pk)
+            subject_class = Klass.find(pk=subject.pk_class)
+            property = Property.find(pk=triple.property_pk)
+            object = self.get_entity(triple.object_pk)
+            object_class = Klass.find(pk=object.pk_class)
+
+            graph_list.append({
+                'subject_pk': subject.pk_entity,
+                'subject_label': f'{subject.label}\n({subject_class.label})',
+                'subject_class_pk': subject_class.pk,
+                'subject_class_label': subject_class.label,
+                'property_pk': property.pk,
+                'property_label': property.label,
+                'object_pk': object.pk_entity,
+                'object_label': f'{object.label}\n({object_class.label})',
+                'object_class_pk': object_class.pk,
+                'object_class_label': object_class.label
+            })
+        
+        return pd.DataFrame(data=graph_list)
