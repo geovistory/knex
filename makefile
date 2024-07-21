@@ -4,7 +4,8 @@
 help:
 	@echo "\033[1mmake save\033[0m \033[3m-> Git add, commit, push to master (message: 'save with make command')\033[0m"
 	@echo "\033[1mmake install\033[0m \033[3m-> Clean, build and locally install the package\033[0m"
-	@echo "=== dev part ==="
+	@echo "=== DEV PART ==="
+	@echo "\033[1mmake dev-update-ontology\033[0m \033[3m-> Update the ontology file in the constants folder, according to OntoMe\033[0m"
 	@echo "\033[1mmake dev-create-graph-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty graph component file, ready to be developed\033[0m"
 	@echo "\033[1mmake dev-create-ner-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty spaCy NER component file, ready to be developed\033[0m"
 	@echo "\033[1mmake dev-spacy-analyze text=[\"EXAMPLE TEXT\"]\033[0m \033[3m-> Run a spaCy analysis on the given text, usefull for a component's development\033[0m"
@@ -62,5 +63,5 @@ dev-run-all-tests:
 dev-knex:
 	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain
 
-
 dev-update-ontology:
+	@python3.10 ./scripts/update-ontology.py

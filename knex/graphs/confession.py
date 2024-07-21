@@ -1,7 +1,8 @@
 from spacy.matcher import Matcher
 from spacy.tokens import Doc
 from ..constants.ontology import *
-from ..globals import nlp, graph, params
+from ..globals import nlp, graph
+from ..debug import debug
 
 
 matcher = Matcher(nlp.vocab)
@@ -25,7 +26,7 @@ def extract_confession(doc: Doc) -> None:
         religion_span = list(filter(lambda ent: ent.label_ == "RELIGION", span.ents))[0]
 
         # Logs
-        if params.debug or 'confession' in params.debug_list:
+        if debug('confession'):
             print(f'> Confession found: {person_span} (PERSON), {religion_span} (RELIGION)')
 
         # Build graph

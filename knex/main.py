@@ -5,11 +5,10 @@ from typing import List
 import pandas as pd
 from pyvis.network import Network
 from gmpykit import wrap, cli_bold, cli_italic, cli_underline
-from .globals import nlp, graph, params
-from .model import KnowledgeExtraction
+from .globals import nlp, graph
 from .spacy_components import *
 from .graphs import *
-from .constants import colors, Klass
+from .constants import colors
 from .debug import debug, init_debug
 from .assertions import get_assertions
 

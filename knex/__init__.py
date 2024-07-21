@@ -1,2 +1,3 @@
-from .main import init, run
+from .main import extract, generate_visual
 from .globals import nlp
+from .schema import *

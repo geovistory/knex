@@ -2,7 +2,8 @@ from typing import Tuple
 import pandas as pd
 from spacy.tokens import Span
 from ..constants.ontology import *
-from ..globals import graph, params
+from ..globals import graph
+from ..debug import debug
 
 def link_date(pk_event: int, date_span: Span) -> None:
 
@@ -12,7 +13,7 @@ def link_date(pk_event: int, date_span: Span) -> None:
         pk_date = graph.create_entity(class_E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
         graph.add_triple(pk_event, property_P82_atSomeTimeWithin, pk_date)
 
-        if params.debug or 'date' in params.debug_list:
+        if debug('date'):
             print(f'> Date "at some time within" {date_span.text}')
 
     # All other cases are "in some time within"

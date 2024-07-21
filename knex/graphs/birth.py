@@ -1,7 +1,8 @@
 from spacy.matcher import DependencyMatcher
 from spacy.tokens import Doc
 from ..constants.ontology import *
-from ..globals import nlp, graph, params
+from ..globals import nlp, graph
+from ..debug import debug
 from .date import link_date
 
 
@@ -41,7 +42,7 @@ def extract_birth(doc):
         if nlp.vocab.strings[match_id] == 'birth_person':
 
             # Logs
-            if params.debug or 'birth' in params.debug_list:
+            if debug('birth'):
                 print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON)')
 
             # Extract info 
@@ -59,7 +60,7 @@ def extract_birth(doc):
         if nlp.vocab.strings[match_id] == 'birth_person_date':
 
             # Logs
-            if params.debug or 'birth' in params.debug_list:
+            if debug('birth'):
                 print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (DATE)')
 
             # Extract info from 
@@ -79,7 +80,7 @@ def extract_birth(doc):
         if nlp.vocab.strings[match_id] == 'birth_person_place':
 
             # Logs
-            if params.debug or 'birth' in params.debug_list:
+            if debug('birth'):
                 print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (GPE)')
 
             # Extract info from 
@@ -100,7 +101,7 @@ def extract_birth(doc):
         if nlp.vocab.strings[match_id] == 'birth_person_date_place':
 
             # Logs
-            if params.debug or 'birth' in params.debug_list:
+            if debug('birth'):
                 print(f'> Birth found: {doc[indexes[1]:indexes[1]+1]} (PERSON), {doc[indexes[2]:indexes[2]+1]} (DATE), {doc[indexes[3]:indexes[3]+1]} (GPE)')
 
             # Extract info from 

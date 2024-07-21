@@ -3,7 +3,8 @@ from spacy.tokens import Span, Doc
 from .entity import Entity
 from .triple import Triple
 import pandas as pd
-from knex.constants import Klass, Property
+from .klass import Klass
+from .property import Property
 
 
 class Graph:
@@ -52,7 +53,7 @@ class Graph:
         
         # Raise an Error if multiples are found
         elif len(same) > 1: 
-            raise Exception(f'Multiple entity found for [{pk_class['label']}:{text}]')
+            raise Exception(f"Multiple entity found for [{pk_class['label']}:{text}]")
         
         # If none is found, create a new one
         else:

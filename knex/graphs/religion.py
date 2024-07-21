@@ -1,6 +1,7 @@
 from spacy.tokens import Doc
 from ..constants.ontology import *
-from ..globals import graph, params
+from ..globals import graph
+from ..debug import debug
 
 
 def extract_religion(doc: Doc) -> None:
@@ -9,7 +10,7 @@ def extract_religion(doc: Doc) -> None:
     religions_spans = list(filter(lambda ent: ent.label_ == 'RELIGION', doc.ents))
 
     # Logs
-    if params.debug or 'religion' in params.debug_list:
+    if debug('religion'):
         print(f'> Religion(s) found: {religions_spans}')
 
     # Create person and there name
