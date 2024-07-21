@@ -8,27 +8,26 @@ The other solution was to pay hundreds hours of development in order to make NLP
 Meet KnEx, an automated knowledge extractor, for any corpus of data, extracting a strict, reusable and scientifically developed and accepted ontology: [OntoMe](https://ontome.net/).
 The main advantage of KnEx is that the code is written. For any corpus. 
 KnEx outputs are multiple, it can be:
-- Triples in form of text
-- Triples in form of dataset (Spreadsheets or directly inserted in databases)
-- RDF triples in a file
-- RDF triples poured in a SPARQL endpoint
+- Triples (datasets, spreadsheets, or directly inserted in databases)
 - Visualizations, like HTML pages or simply images.
+- RDF triples in a file (To be developed)
+- RDF triples poured in a SPARQL endpoint (To be developed)
 
 
 ## How it works (headlines) ?
 
-- Given raw text is reformulated (by a LLM)
-- Entities and word roles are identified inside the reformlated strings (NLP techniques)
+- A given raw text is reformulated (by a LLM)
+- Entities and word roles are identified inside the reformulated strings (NLP techniques)
 - The graph is built, following the ontology
 
 
-## How it works (detailed) ?
+## How it works (more detailed) ?
 
 - KnEx get the raw text to extract knowledge from.
 - A LLM is asked to rephrase each given text from the corpus in a more usable (understand 'NLP parsable') way: give a list, the most complete possible, of particle assertions understood from the initial text. To do that, some prompt engineering is done.
 - Run a *spaCy* pipeline (the default ones plus those created in this library) on the assertions to get lemmas, POS, NER, ... 
-- Run NLP algorithm to build a graph between the identified entities, based on *spaCy* pipeline results. Handle the fact that an entity can be multiple times identified in the assertions: reasonably handle duplicated entities (only inside the same text) 
-- Return the assertions, parsed knowledge graph and some feedback strings
+- Run NLP algorithm to build a graph between the identified entities, based on *spaCy* pipeline results. KnEx handles the fact that an entity can be identified multiple times in the assertions: reasonably deduplicates entities (first round of deduplication)
+- Return the assertions, parsed knowledge graph and some feedback strings. Feedbacks are usefull to, as the word state it, give feeback to the developer (or the app) about what has been identified and what has not in the initial text.
 
 
 ## What is in the repository
@@ -58,11 +57,37 @@ For usability, and to avoid code duplication, this package depends on *spaCy*, f
 
 ## How to use (Library API):
 
-- extract
-- get_assertions
-- generate_visuals
+**Extract graph from a text**
+```python
+import knex
 
+text = 'This is an example text' # Any text
+graph, feedbacks = knex.extract(text)
 
+# graph is a Pandas DataFrame that contains the full graph of the execution
+# feedbacks: initial text + some information. This is usefull to see what has been parsed, and what has not.
+```
+
+**Get LLM assertions from a text**
+```python
+import knex
+
+text = 'This is an example text' # Any text
+assertions = knex.get_assertions(text)
+
+# assertions is a list of string, with each element being a assertion that is in the initial text
+```
+
+**Generate HTML visuals**
+```python
+import knex
+
+text = 'This is an example text' # Any text
+graph, feedbacks = knex.extract(text)
+
+html_path = './graph-visual.html'
+knex.generate_visual(graph, html_path)
+```
 
 
 ## How to develop ?
