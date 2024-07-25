@@ -1,6 +1,6 @@
 from spacy.matcher import DependencyMatcher
 from spacy.tokens import Doc
-from ..constants.ontology import *
+from ..constants.ontology import classes, properties
 from ..globals import nlp, graph
 from ..debug import debug
 from .date import link_date
@@ -49,11 +49,11 @@ def extract_birth(doc):
             person_span = doc[indexes[1]:indexes[1]+1]
 
             # Create nodes
-            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
-            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
+            pk_person = graph.create_entity(classes.E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(classes.E67_birth, text=person_span.text)
 
             # Create edges
-            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
+            graph.add_triple(pk_birth, properties.P98_broughtIntoLife, pk_person)
 
 
         # If we have the birth of a person at a date
@@ -68,11 +68,11 @@ def extract_birth(doc):
             date_span = doc[indexes[2]:indexes[2]+1]
 
             # Create nodes
-            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
-            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
+            pk_person = graph.create_entity(classes.E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(classes.E67_birth, text=person_span.text)
 
             # Link nodes
-            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
+            graph.add_triple(pk_birth, properties.P98_broughtIntoLife, pk_person)
             link_date(pk_birth, date_span)
 
 
@@ -88,13 +88,13 @@ def extract_birth(doc):
             geoplace_span = doc[indexes[2]:indexes[2]+1]
 
             # Create nodes
-            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
-            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
-            pk_geoplace = graph.create_entity(class_C13_geographicalPlace, span=geoplace_span, linked=True)
+            pk_person = graph.create_entity(classes.E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(classes.E67_birth, text=person_span.text)
+            pk_geoplace = graph.create_entity(classes.C13_geographicalPlace, span=geoplace_span, linked=True)
 
             # Link nodes
-            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
-            graph.add_triple(pk_birth, property_P6_tookPlaceAt, pk_geoplace)
+            graph.add_triple(pk_birth, properties.P98_broughtIntoLife, pk_person)
+            graph.add_triple(pk_birth, properties.P8_tookPlaceOnOrWithin, pk_geoplace)
 
 
         # If we have the birth of a person at a date in a place
@@ -110,13 +110,13 @@ def extract_birth(doc):
             geoplace_span = doc[indexes[3]:indexes[3]+1]
 
             # Create nodes
-            pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
-            pk_birth = graph.create_entity(class_E67_birth, text=person_span.text)
-            pk_geoplace = graph.create_entity(class_C13_geographicalPlace, span=geoplace_span, linked=True)
+            pk_person = graph.create_entity(classes.E21_person, span=person_span, linked=True)
+            pk_birth = graph.create_entity(classes.E67_birth, text=person_span.text)
+            pk_geoplace = graph.create_entity(classes.C13_geographicalPlace, span=geoplace_span, linked=True)
 
             # Link nodes
-            graph.add_triple(pk_birth, property_P98_broughtIntoLife, pk_person)
-            graph.add_triple(pk_birth, property_P6_tookPlaceAt, pk_geoplace)
+            graph.add_triple(pk_birth, properties.P98_broughtIntoLife, pk_person)
+            graph.add_triple(pk_birth, properties.P8_tookPlaceOnOrWithin, pk_geoplace)
             link_date(pk_birth, date_span)
 
 graph.functions.append(extract_birth)

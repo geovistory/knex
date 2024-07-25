@@ -1,6 +1,6 @@
 from spacy.matcher import Matcher
 from spacy.tokens import Doc
-from ..constants.ontology import *
+from ..constants.ontology import classes, properties
 from ..globals import nlp, graph
 from ..debug import debug
 
@@ -30,9 +30,9 @@ def extract_confession(doc: Doc) -> None:
             print(f'> Confession found: {person_span} (PERSON), {religion_span} (RELIGION)')
 
         # Build graph
-        pk_person = graph.create_entity(class_E21_person, span=person_span, linked=True)
-        pk_religion = graph.create_entity(class_C23_religiousIdentity, span=religion_span, linked=True)
-        graph.add_triple(pk_religion, property_P36_pertainsTo, pk_person)
+        pk_person = graph.create_entity(classes.E21_person, span=person_span, linked=True)
+        pk_religion = graph.create_entity(classes.C23_religiousIdentity, span=religion_span, linked=True)
+        graph.add_triple(pk_religion, properties.P36_pertainsTo, pk_person)
 
 
 graph.functions.append(extract_confession)

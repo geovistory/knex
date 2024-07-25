@@ -58,7 +58,7 @@ dev-spacy-analyze:
 	@python3.12 ./scripts/spacy-analyze-text.py "$$text"
 
 dev-run-all-tests:
-	@python3.12 ./tests/graphs.py
+	@python3.12 ./tests/run.py
 
 dev-knex:
 	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain

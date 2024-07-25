@@ -1,7 +1,7 @@
 from typing import Tuple
 import pandas as pd
 from spacy.tokens import Span
-from ..constants.ontology import *
+from ..constants.ontology import classes, properties
 from ..globals import graph
 from ..debug import debug
 
@@ -10,8 +10,8 @@ def link_date(pk_event: int, date_span: Span) -> None:
     # If the date is something like "in 1987" or "in 10.10.2023"
     if 'in' in date_span.text or 'on' in date_span.text:
         date_tuple = __parse_date(date_span.text.replace('in', '').replace('on', '').strip())
-        pk_date = graph.create_entity(class_E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
-        graph.add_triple(pk_event, property_P82_atSomeTimeWithin, pk_date)
+        pk_date = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
+        graph.add_triple(pk_event, properties.P82_atSomeTimeWithin, pk_date)
 
         if debug('date'):
             print(f'> Date "at some time within" {date_span.text}')
@@ -19,10 +19,10 @@ def link_date(pk_event: int, date_span: Span) -> None:
     # All other cases are "in some time within"
     else:
         date_tuple = __parse_date(date_span.text)
-        pk_date = graph.create_entity(class_E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
-        graph.add_triple(pk_event, property_P82_atSomeTimeWithin, pk_date)
+        pk_date = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
+        graph.add_triple(pk_event, properties.P82_atSomeTimeWithin, pk_date)
 
-        if params.debug or 'date' in params.debug_list:
+        if debug('date'):
             print(f'> Date "At some time within" {date_span.text}')
 
 

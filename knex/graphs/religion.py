@@ -1,5 +1,5 @@
 from spacy.tokens import Doc
-from ..constants.ontology import *
+from ..constants.ontology import classes, properties
 from ..globals import graph
 from ..debug import debug
 
@@ -15,11 +15,11 @@ def extract_religion(doc: Doc) -> None:
 
     # Create person and there name
     for religion_span in religions_spans:
-        pk_religion = graph.create_entity(class_C23_religiousIdentity, span=religion_span)
-        pk_appellation = graph.create_entity(class_E41_appellation, text=religion_span.text)
-        pk_aial = graph.create_entity(class_C11_appellationInALanguage, text=religion_span.text)
-        graph.add_triple(pk_aial, property_P11_isAppellationForLanguageOf, pk_religion)
-        graph.add_triple(pk_aial, property_P13_refersToName, pk_appellation)
+        pk_religion = graph.create_entity(classes.C23_religiousIdentity, span=religion_span)
+        pk_appellation = graph.create_entity(classes.E41_appellation, text=religion_span.text)
+        pk_aial = graph.create_entity(classes.C11_appellationInALanguage, text=religion_span.text)
+        graph.add_triple(pk_aial, properties.P11_isAppellationForLanguageOf, pk_religion)
+        graph.add_triple(pk_aial, properties.P13_refersToName, pk_appellation)
 
 
 graph.functions.append(extract_religion)

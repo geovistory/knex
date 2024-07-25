@@ -2,9 +2,9 @@ from typing import List, Set
 from spacy.tokens import Span, Doc
 from .entity import Entity
 from .triple import Triple
+from ..constants import ontology
 import pandas as pd
-from .klass import Klass
-from .property import Property
+
 
 
 class Graph:
@@ -98,10 +98,10 @@ class Graph:
         # graph['subject_pk_class'] = pd.NA
         for triple in self.triples:
             subject = self.get_entity(triple.subject_pk)
-            subject_class = Klass.find(pk=subject.pk_class)
-            property = Property.find(pk=triple.property_pk)
+            subject_class = ontology.klass(subject.pk_class)
+            property = ontology.property(triple.property_pk)
             object = self.get_entity(triple.object_pk)
-            object_class = Klass.find(pk=object.pk_class)
+            object_class = ontology.klass(object.pk_class)
 
             graph_list.append({
                 'subject_pk': subject.pk_entity,

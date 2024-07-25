@@ -35,7 +35,7 @@ def extract(
 
     # init phase
     if reset_graph: graph.reset()
-    input_text = input_text.strip()
+    input_text = text.strip()
     init_debug(debug_list)
     feedbacks = []
 
