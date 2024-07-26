@@ -1,5 +1,4 @@
 import sys
-import spacy
 from knex import nlp
 
 string = sys.argv[1]

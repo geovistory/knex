@@ -3,7 +3,7 @@ from ..globals import graph_tests
 from knex import classes, properties
 
 graph_tests.append(TestGraph(
-    name = 'Single death with date',
+    name = 'Death with date',
     input_text = 'Cajetan Tschudi died in 1855.',
     compute_assertions = False,
     should_columns = ['subject_class_pk', 'property_pk', 'object_class_pk', 'object_label'],
@@ -14,7 +14,7 @@ graph_tests.append(TestGraph(
 ))
 
 graph_tests.append(TestGraph(
-    name = 'Single death with place',
+    name = 'Death with place',
     input_text = 'Cajetan Tschudi died in Naples.',
     compute_assertions = False,
     should_columns = ['subject_class_pk', 'property_pk', 'object_class_pk', 'object_label'],
@@ -25,7 +25,7 @@ graph_tests.append(TestGraph(
 ))
 
 graph_tests.append(TestGraph(
-    name = 'Single death with date and place',
+    name = 'Death with date and place',
     input_text = 'Cajetan Tschudi died on 26.10.1787 in Naples.',
     compute_assertions = False,
     should_columns = ['subject_class_pk', 'property_pk', 'object_class_pk', 'object_label'],

@@ -6,9 +6,9 @@ help:
 	@echo "\033[1mmake install\033[0m \033[3m-> Clean, build and locally install the package\033[0m"
 	@echo "=== DEV PART ==="
 	@echo "\033[1mmake update-ontology\033[0m \033[3m-> Update the ontology file in the constants folder, according to OntoMe\033[0m"
-	@echo "\033[1mmake create-graph-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty graph component file, ready to be developed\033[0m"
-	@echo "\033[1mmake create-ner-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty spaCy NER component file, ready to be developed\033[0m"
-	@echo "\033[1mmake spacy-analyze text=[\"EXAMPLE TEXT\"]\033[0m \033[3m-> Run a spaCy analysis on the given text, usefull for a component's development\033[0m"
+	@echo "\033[1mmake new-graph-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty graph component file, ready to be developed\033[0m"
+	@echo "\033[1mmake new-ner-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty spaCy NER component file, ready to be developed\033[0m"
+	@echo "\033[1mmake analyze text=[\"EXAMPLE TEXT\"]\033[0m \033[3m-> Run an KnEx analysis on the given text, usefull for a component's development\033[0m"
 	@echo "\033[1mmake test\033[0m \033[3m-> Run all the tests in ./tests/ folder\033[0m"
 	@echo "\033[1mmake knex text=[\"EXAMPLE TEXT\"] explain=[person,birth]\033[0m \033[3m-> Test the library on a given text, and debug a list of components\033[0m"
 
@@ -42,20 +42,20 @@ install: clean build install-local
 ###############################
 
 
-create-graph-component:
+new-graph-component:
 	@echo "Creating graph component at ./knex/graphs/$$name.py"; \
 	sed -e "s/THE_NAME/$$name/g" ./templates/graph-component.py > ./knex/graphs/$$name.py; \
 	echo -n "\nfrom .$$name import *" >> ./knex/graphs/__init__.py; \
 	code ./knex/graphs/$$name.py
 
-create-ner-component:
+new-ner-component:
 	@echo "Creating NER component at ./knex/spacy_components/$$name.py"; \
 	sed -e "s/THE_NAME/$$name/g" ./templates/ner-spacy-component.py > ./knex/spacy_components/$$name.py; \
 	echo -n "\nfrom .$$name import *" >> ./knex/spacy_components/__init__.py; \
 	code ./knex/spacy_components/$$name.py
 
-spacy-analyze:
-	@python3.12 ./scripts/spacy-analyze-text.py "$$text"
+analyze:
+	@python3.12 ./scripts/analyze.py "$$text"
 
 tests:
 	@python3.12 ./scripts/run_tests.py
