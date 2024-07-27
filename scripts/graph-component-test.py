@@ -1,11 +1,16 @@
 import sys
-import knex
+from knex import extract, KnexOptions
 
 text = sys.argv[1]
 debug_list = sys.argv[2].split(',') if len(sys.argv) >= 3 else []
 
-knex.init(ask_llm=False, visual=True, debug_list=debug_list)
-response = knex.run(text)
+options = KnexOptions(compute_assertions=False, return_feedbacks=True)
 
-print('>>>> FEEDBACK <<<<')
+response = extract(text, options, debug_list=debug_list)
+
+print('\n>>>> FEEDBACK <<<<')
 print(response.feedback)
+
+
+print('\n>>> GRAPH <<<')
+print(response.graph[['subject_label', 'property_label', 'object_label']])

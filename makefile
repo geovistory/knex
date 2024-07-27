@@ -9,8 +9,8 @@ help:
 	@echo "\033[1mmake new-graph-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty graph component file, ready to be developed\033[0m"
 	@echo "\033[1mmake new-ner-component name=[COMPONENT_NAME]\033[0m \033[3m-> Create an empty spaCy NER component file, ready to be developed\033[0m"
 	@echo "\033[1mmake analyze text=[\"EXAMPLE TEXT\"]\033[0m \033[3m-> Run an KnEx analysis on the given text, usefull for a component's development\033[0m"
-	@echo "\033[1mmake test\033[0m \033[3m-> Run all the tests in ./tests/ folder\033[0m"
-	@echo "\033[1mmake knex text=[\"EXAMPLE TEXT\"] explain=[person,birth]\033[0m \033[3m-> Test the library on a given text, and debug a list of components\033[0m"
+	@echo "\033[1mmake graph text=[\"EXAMPLE TEXT\"] explain=[person,birth]\033[0m \033[3m-> Test the library on a given text, and debug a list of components\033[0m"
+	@echo "\033[1mmake tests\033[0m \033[3m-> Run all the tests in ./tests/ folder\033[0m"
 
 save:
 	@git add .
@@ -57,11 +57,11 @@ new-ner-component:
 analyze:
 	@python3.12 ./scripts/analyze.py "$$text"
 
+graph:
+	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain
+
 tests:
 	@python3.12 ./scripts/run_tests.py
-
-knex:
-	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain
 
 update-ontology:
 	@python3.10 ./scripts/update-ontology.py
