@@ -8,9 +8,8 @@ from .date import link_date
 
 # If there is a pattern matcher to be added, else you can remove next part
 matcher = Matcher(nlp.vocab)
-patterns = [
-]
-matcher.add("THE_NAME", patterns)
+matcher.add("THE_NAME", [
+])
 
 
 # If there is a dependency matcher to be added, else you can remove next part
@@ -26,17 +25,22 @@ def extract_THE_NAME(doc: Doc) -> None:
     matchings = matcher(doc)
     for match_id, start, end in matchings:
 
+        # If we have the XXX matching
+        # if nlp.vocab.strings[match_id] == '':
+
         # Extract NER from the span
         span = doc[start:end]
-        span = list(filter(lambda ent: ent.label_ == "", span.ents))
+        XXX_span = list(filter(lambda ent: ent.label_ == "", span.ents))
 
         # Logs
         if debug('THE_NAME'):
             print(f'> THE_NAME found: {span.text} ()')
 
-        # Build graph
-        for _span in span:
-            pass
+        # Build graph: nodes
+        pk_XXX = graph.create_entity(classes., span=XXX_span, linked=True)
+
+        # Build graph: edges
+        graph.add_triple(pk_XXX, properties., pk_XXX)
 
 
     # For the dependency matcher
@@ -52,10 +56,10 @@ def extract_THE_NAME(doc: Doc) -> None:
             # Extract info from matching 
             _span = doc[indexes[1]:indexes[1]+1]
 
-            # Create nodes
+            # Build graph: nodes
             pk_ = graph.create_entity(-1, span=_span, linked=True)
 
-            # Link nodes
+            # Build graph: entities
             graph.add_triple(-1, -1, -1)
 
 
