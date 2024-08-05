@@ -6,13 +6,22 @@ from ..debug import debug
 
 
 matcher = Matcher(nlp.vocab)
-matcher.add("parent_single", [
+matcher.add("parent_single1", [
     # PERSON be PERSON's [mother | father]
-    [{'ENT_TYPE':'PERSON'}, {'LEMMA':'be'}, {'ENT_TYPE':'PERSON'}, {'LEMMA':'\'s'}, {'LEMMA': {'IN': ['mother', 'father']}}]
+    [{'ENT_TYPE':'PERSON'}, {'LEMMA':'be'}, {'ENT_TYPE':'PERSON'}, {'LEMMA':'\'s', 'OP': '?'}, {'LEMMA': {'IN':['mother','father']}}]
+])
+matcher.add("parent_single2", [
+    # PERSON's be PERSON [mother | father]
+    [{'ENT_TYPE':'PERSON'}, {'LEMMA':'\'s', 'OP':'?'}, {'LEMMA': {'IN': ['mother', 'father']}}, {'LEMMA':'be'}, {'ENT_TYPE':'PERSON'}]
 ])
 matcher.add("parent_both", [
     # PERSON be PERSON's [mother | father]
-    [{'ENT_TYPE':'PERSON'}, {'LEMMA':'\s', 'OP': '?'}, {'LEMMA':'parent'}, {'LEMMA':'be'}, {'ENT_TYPE':'PERSON'}, {'LEMMA':'and'}, {'ENT_TYPE':'PERSON'}]
+    [{'ENT_TYPE':'PERSON'}, {'LEMMA':'\s', 'OP':'?'}, {'LEMMA':'parent'}, {'LEMMA':'be'}, {'ENT_TYPE':'PERSON'}, {'LEMMA':'and'}, {'ENT_TYPE':'PERSON'}]
+])
+matcher.add("parent_child", [
+    # PERSON be the [son | daughter] of PERSON
+    [{'ENT_TYPE':'PERSON'}, {'LEMMA':'be'}, {'LEMMA':'the'}, {'LEMMA':{'IN':['daughter','son']}}, {'LEMMA':'of'}, {'ENT_TYPE':'PERSON'}, ]
+
 ])
 
 
@@ -23,13 +32,38 @@ def extract_parents(doc: Doc) -> None:
     for match_id, start, end in matchings:
 
         # If we have the parent_single matching
-        if nlp.vocab.strings[match_id] == 'parent_single':
+        if nlp.vocab.strings[match_id] == 'parent_single1':
 
             # Extract NER from the span
             # Because of how the pattern is build, there can only be single entities in the spans
             span = doc[start:end]
             child_span = list(filter(lambda ent: ent.label_ == "PERSON", span.ents))[0]
             parent1_span = list(filter(lambda ent: ent.label_ == "PERSON", span.ents))[1]
+
+            # Logs
+            if debug('parent'):
+                print(f'> Parenting found: {child_span} (PERSON, parent), {parent1_span} (PERSON, child)')
+
+            # Build graph: nodes
+            pk_child = graph.create_entity(classes.E21_person, span=child_span, linked=True)
+            pk_parent1 = graph.create_entity(classes.E21_person, span=parent1_span, linked=True)
+            pk_birth = graph.create_entity(classes.E67_birth, text=parent1_span.text)
+            pk_union = graph.create_entity(classes.C9_relationship, text=child_span.text)
+
+            # Build graph: edges
+            graph.add_triple(pk_birth, properties.P98_broughtIntoLife, pk_parent1)
+            graph.add_triple(pk_birth, properties.P22_stemmedFrom, pk_union)
+            graph.add_triple(pk_union, properties.P20_hadPartner, pk_child)
+
+
+        # If we have the parent_single matching
+        if nlp.vocab.strings[match_id] in ['parent_single2', 'parent_child']:
+
+            # Extract NER from the span
+            # Because of how the pattern is build, there can only be single entities in the spans
+            span = doc[start:end]
+            child_span = list(filter(lambda ent: ent.label_ == "PERSON", span.ents))[1]
+            parent1_span = list(filter(lambda ent: ent.label_ == "PERSON", span.ents))[0]
 
             # Logs
             if debug('parent'):
@@ -73,6 +107,8 @@ def extract_parents(doc: Doc) -> None:
             graph.add_triple(pk_birth, properties.P22_stemmedFrom, pk_union)
             graph.add_triple(pk_union, properties.P20_hadPartner, pk_parent1)
             graph.add_triple(pk_union, properties.P20_hadPartner, pk_parent2)
+
+
 
 
 graph.functions.append(extract_parents)
