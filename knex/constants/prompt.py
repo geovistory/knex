@@ -7,17 +7,14 @@ Dates should have the following format: day.month.year (eg 31.12.2000).
 Do not be verbose, here is what your answer should look like:
 "Atomic assertions:
 - John Doe was French -> nationality
+- John Doe was born in 1950 in Basel -> birth
 - John Doe was a carpenter -> job
 - John Doe was the son of Martin -> family
 - John Doe married Augustine in 1988 -> family
 - Augustine was a Catholic -> religion
 - Augustine's parents are Albert and Justine -> family
 - Albert was a general -> job"
-
-Text: "[INPUT_TEXT]"  
 """
-
-
 
 # Old prompt from v0, used with mistral
 # prompt = """

@@ -85,7 +85,6 @@ def extract(
     else: to_return.assertions = list(map(lambda sentence: sentence.text.strip(), nlp(input_text).sents))
     if debug('assertions'): [print(assertion.strip()) for assertion in to_return.assertions]
 
-
     # Extraction
     if debug('extraction'): print(cli_bold('[KNEX] > Extract data from assertions:'))
     to_return.docs = list(nlp.pipe(to_return.assertions))

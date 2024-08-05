@@ -13,7 +13,7 @@ Token.set_extension('linked', default=False)
 # Spacy NLP object which components list is extended in the knex/components folder
 nlp = spacy.load('en_core_web_trf')
 nlp.add_pipe('merge_entities')
-nlp.add_pipe('merge_noun_chunks')
+# nlp.add_pipe('merge_noun_chunks') # Becareful: adds the "a" before a word: eg "a catholic" instead of "catholic"
 
 
 # Knex graph object which contains all info needed from extrated information.

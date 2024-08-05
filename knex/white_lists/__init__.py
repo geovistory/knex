@@ -1,0 +1,1 @@
+from .occupations import occupations_white_list

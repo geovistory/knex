@@ -1,16 +1,19 @@
 from spacy.matcher import Matcher, DependencyMatcher
 from spacy.tokens import Doc
 from ..constants.ontology import *
-from ..globals import nlp, graph, params
+from ..globals import nlp, graph
+from ..debug import debug
 from .date import link_date
 
 
+# If there is a pattern matcher to be added, else you can remove next part
 matcher = Matcher(nlp.vocab)
 patterns = [
 ]
-# matcher.add("THE_NAME", patterns)
+matcher.add("THE_NAME", patterns)
 
 
+# If there is a dependency matcher to be added, else you can remove next part
 matcher = DependencyMatcher(nlp.vocab)
 pattern = [
 ]
@@ -21,18 +24,18 @@ def extract_THE_NAME(doc: Doc) -> None:
 
     # For the matcher
     matchings = matcher(doc)
-    for _, start, end in matchings:
+    for match_id, start, end in matchings:
 
         # Extract NER from the span
         span = doc[start:end]
-        _spans = list(filter(lambda ent: ent.label_ == "", span.ents))
+        span = list(filter(lambda ent: ent.label_ == "", span.ents))
 
         # Logs
-        if params.debug or 'THE_NAME' in params.debug_list:
-            print(f'> THE_NAME found: {_spans.text} ()')
+        if debug('THE_NAME'):
+            print(f'> THE_NAME found: {span.text} ()')
 
         # Build graph
-        for _span in _spans:
+        for _span in span:
             pass
 
 
@@ -43,7 +46,7 @@ def extract_THE_NAME(doc: Doc) -> None:
         if nlp.vocab.strings[match_id] == '':
 
             # Logs
-            if params.debug or 'THE_NAME' in params.debug_list:
+            if debug('THE_NAME'):
                 print(f'> THE_NAME found: ')
 
             # Extract info from matching 

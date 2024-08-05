@@ -16,6 +16,27 @@ def link_date(pk_event: int, date_span: Span) -> None:
         if debug('date'):
             print(f'> Date "at some time within" {date_span.text}')
 
+
+    # If the date is something like "from 1987"
+    elif 'from' in date_span.text:
+        date_tuple = __parse_date(date_span.text.replace('from', '').strip())
+        pk_date = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
+        graph.add_triple(pk_event, properties.P82a_beginOfTheBegin, pk_date)
+
+        if debug('date'):
+            print(f'> Date "begin of the begin" {date_span.text}')
+
+
+    # If the date is something like "from 1987"
+    elif 'to' in date_span.text:
+        date_tuple = __parse_date(date_span.text.replace('to', '').strip())
+        pk_date = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date_tuple), linked=True)
+        graph.add_triple(pk_event, properties.P82b_endOfTheEnd, pk_date)
+
+        if debug('date'):
+            print(f'> Date "end of the end" {date_span.text}')
+
+
     # All other cases are "at some time within"
     else:
         date_tuple = __parse_date(date_span.text)

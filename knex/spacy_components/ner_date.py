@@ -8,6 +8,7 @@ matcher = Matcher(nlp.vocab)
 patterns = [
     [{'LEMMA': {'IN':['in']}}, {'ENT_TYPE':'DATE'}],
     [{'LEMMA': {'IN':['on']}}, {'ENT_TYPE':'DATE'}],
+    [{'LEMMA': {'IN':['from', 'to']}}, {'ENT_TYPE':'DATE'}],
 ]
 matcher.add('DATE', patterns)
 

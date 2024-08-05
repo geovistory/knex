@@ -2,16 +2,16 @@ from spacy.matcher import PhraseMatcher
 from spacy.language import Language
 from spacy.tokens import Span, Doc
 from ..main import nlp
+from ..white_lists import occupations_white_list as white_list
 
-white_list = ['catholic', 'protestant', 'chrétien']
 black_list = []
 
 matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
-matcher.add('RELIGION', list(nlp.pipe(white_list)))
+matcher.add('OCCUPATION', list(nlp.pipe(white_list)))
 
 
-@Language.component('ner_religion')
-def ner_religion(doc: Doc) -> Doc:
+@Language.component('ner_occupation')
+def ner_occupation(doc: Doc) -> Doc:
 
     # This is a new entity label. 
     # So first, we need to remove those found as something else who could match either white or black list.
@@ -22,12 +22,13 @@ def ner_religion(doc: Doc) -> Doc:
     # doc.ents = list(filter(lambda ent: ent.lemma_ not in white_list and ent.lemma_ not in black_list, doc.ents))
 
     # Add as entity all whitelisted entity
-    religions = [Span(doc, start, end, label='RELIGION') for _, start, end in matcher(doc)]
+    occupations = [Span(doc, start, end, label='OCCUPATION') for _, start, end in matcher(doc)]
 
     # Add new entities
-    doc.ents = list(doc.ents) + religions
+    doc.ents = list(doc.ents) + occupations
+
 
     return doc
 
 
-nlp.add_pipe('ner_religion', before='merge_entities')
+nlp.add_pipe('ner_occupation', before='merge_entities')
