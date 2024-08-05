@@ -25,7 +25,7 @@ def ner_date(doc: Doc) -> Doc:
         span = Span(doc, start, end, label='DATE')
 
         # If there was entities in the span, remove them from the doc
-        doc.ents = list(filter(lambda ent: ent.end < span.start or span.end < ent.start, doc.ents))
+        doc.ents = list(filter(lambda ent: ent.end <= span.start or span.end <= ent.start, doc.ents))
 
         # Add the span to the add list
         spans.append(span)

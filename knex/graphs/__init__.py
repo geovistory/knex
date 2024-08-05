@@ -1,6 +1,7 @@
 from .birth import *
 from .death import *
 from .geoplace import *
+from .marriage import *
 from .parent import *
 from .person import *
 from .confession import *
