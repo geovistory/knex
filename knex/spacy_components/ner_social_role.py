@@ -1,37 +1,29 @@
-from spacy.matcher import Matcher
+from spacy.matcher import PhraseMatcher
 from spacy.language import Language
 from spacy.tokens import Span, Doc
 from ..main import nlp
+from ..white_lists import social_role_white_list as white_list
+from ..globals import update_entities
 
 
-social_role_base = ['princess', 'queen', 'prince', 'king']
+matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
+matcher.add('SOCIAL_ROLE', list(nlp.pipe(white_list)))
 
-matcher = Matcher(nlp.vocab)
-patterns = [
-    # TITLE of GPE
-    [{'TEXT': {'IN':social_role_base}}, {'LEMMA':'of'}, {'ENT_TYPE':'GPE'}]
-]
-matcher.add('SOCIAL_ROLE', patterns)
 
 @Language.component('ner_social_role')
 def ner_social_role(doc: Doc) -> Doc:
 
     # Add as entity all whitelisted entity
-    matchings = matcher(doc)
-    spans = []
-    for _, start, end in matchings:
-        
+    social_roles = []
+    for _, start, end in matcher(doc):
         # Create the span
         span = Span(doc, start, end, label='SOCIAL_ROLE')
 
-        # If there was entities in the span, remove them from the doc
-        doc.ents = list(filter(lambda ent: ent.end < span.start or span.end < ent.start, doc.ents))
-
         # Add the span to the add list
-        spans.append(span)
+        social_roles.append(span)
 
-    # Update the document entities
-    doc.ents = list(doc.ents) + spans
+    # Add new entities
+    doc = update_entities(doc, social_roles)
 
     return doc
 

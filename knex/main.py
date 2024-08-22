@@ -1,6 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 
+from unidecode import unidecode
 from typing import List
 import pandas as pd
 from pyvis.network import Network
@@ -87,7 +88,7 @@ def extract(
 
     # Extraction
     if debug('extraction'): print(cli_bold('[KNEX] > Extract data from assertions:'))
-    to_return.docs = list(nlp.pipe(to_return.assertions))
+    to_return.docs = list(nlp.pipe(list(map(lambda text: unidecode(text), to_return.assertions))))
     for doc in to_return.docs: # According to spaCy documentation, this is the most efficient way of running pipeline on a string.
         if debug('extraction'): print(cli_bold(f'>> "{doc.text}"'))
         graph.extract(doc)

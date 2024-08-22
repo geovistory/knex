@@ -21,7 +21,6 @@ matcher.add("parent_both", [
 matcher.add("parent_child", [
     # PERSON be the [son | daughter] of PERSON
     [{'ENT_TYPE':'PERSON'}, {'LEMMA':'be'}, {'LEMMA':'the'}, {'LEMMA':{'IN':['daughter','son']}}, {'LEMMA':'of'}, {'ENT_TYPE':'PERSON'}, ]
-
 ])
 
 

@@ -33,6 +33,7 @@ build:
 
 install-local:
 	@pip install -e .
+	@python3.10 -m pip install -e .
 	
 install: clean build install-local
 
@@ -55,13 +56,13 @@ new-ner-component:
 	code ./knex/spacy_components/$$name.py
 
 analyze:
-	@python3.12 ./scripts/analyze.py "$$text"
+	@python3.10 ./scripts/analyze.py "$$text"
 
 graph:
-	@python3.12 ./scripts/graph-component-test.py "$$text" $$explain
+	@python3.10 ./scripts/graph-component-test.py "$$text" $$explain
 
 tests:
-	@python3.12 ./scripts/run_tests.py
+	@python3.10 ./scripts/run_tests.py
 
 update-ontology:
 	@python3.10 ./scripts/update-ontology.py

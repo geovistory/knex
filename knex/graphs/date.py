@@ -17,6 +17,28 @@ def link_date(pk_event: int, date_span: Span) -> None:
             print(f'> Date "at some time within" {date_span.text}')
 
 
+    elif 'from' in date_span.text and 'to' in date_span.text:
+        dates = date_span.text.split(' ')
+        date1_tuple = __parse_date(dates[1])
+        date2_tuple = __parse_date(dates[3])
+
+        pk_date1 = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date1_tuple), linked=True)
+        pk_date2 = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date2_tuple), linked=True)
+        graph.add_triple(pk_event, properties.P82a_beginOfTheBegin, pk_date1)
+        graph.add_triple(pk_event, properties.P82b_endOfTheEnd, pk_date2)
+
+
+    elif '-' in date_span.text:
+        dates = date_span.text.split('-')
+        date1_tuple = __parse_date(dates[0])
+        date2_tuple = __parse_date(dates[1])
+
+        pk_date1 = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date1_tuple), linked=True)
+        pk_date2 = graph.create_entity(classes.E61_timePrimitive, span=date_span, text=str(date2_tuple), linked=True)
+        graph.add_triple(pk_event, properties.P82a_beginOfTheBegin, pk_date1)
+        graph.add_triple(pk_event, properties.P82b_endOfTheEnd, pk_date2)
+
+
     # If the date is something like "from 1987"
     elif 'from' in date_span.text:
         date_tuple = __parse_date(date_span.text.replace('from', '').strip())
