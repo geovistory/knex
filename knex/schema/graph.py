@@ -37,8 +37,8 @@ class Graph:
         """Create or get (pk) an existing entity based on given information."""
 
         # Get the entity label
-        if text: label = text.title()
-        if span and not text: label = span.text.title()
+        if text: label = text.replace("'s", '').title()
+        if span and not text: label = span.text.replace("'s", '').title()
 
         # Find similar entities (if exist): entities that have the same class and the same label. i.e. record linkage
         same = list(filter(lambda entity: entity.pk_class == pk_class and entity.label == label, self.entities))

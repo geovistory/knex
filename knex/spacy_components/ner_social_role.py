@@ -7,7 +7,7 @@ from ..globals import update_entities
 
 
 matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
-matcher.add('SOCIAL_ROLE', list(nlp.pipe(white_list)))
+matcher.add('SOCIAL_ROLE', [nlp.make_doc(text) for text in white_list])
 
 
 @Language.component('ner_social_role')

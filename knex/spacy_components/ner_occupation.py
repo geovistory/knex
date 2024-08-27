@@ -5,10 +5,8 @@ from ..main import nlp
 from ..white_lists import occupations_white_list as white_list
 from ..globals import update_entities
 
-
 matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
-matcher.add('OCCUPATION', list(nlp.pipe(white_list)))
-
+matcher.add('OCCUPATION', [nlp.make_doc(text) for text in white_list])
 
 @Language.component('ner_occupation')
 def ner_occupation(doc: Doc) -> Doc:

@@ -16,4 +16,6 @@ social_role_white_list = list(map(lambda text: unidecode(text),
     'Procureur Général',
     'Member of the Grand Conseil',
     'Cantonal Judge',
+    'municipal counselor',
+    'juge de paix'
 ]))

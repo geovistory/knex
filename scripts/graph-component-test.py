@@ -1,12 +1,10 @@
 import sys
-from knex import extract, KnexOptions
+from knex import extract
 
 text = sys.argv[1]
 debug_list = sys.argv[2].split(',') if len(sys.argv) >= 3 else []
 
-options = KnexOptions(compute_assertions=False, return_feedbacks=True)
-
-response = extract(text, options, debug_list=debug_list)
+response = extract(text, debug_list=debug_list, compute_assertions=False, return_feedbacks=True)
 
 print('\n>>>> FEEDBACK <<<<')
 print(response.feedback)

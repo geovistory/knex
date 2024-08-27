@@ -7,14 +7,15 @@ from ..globals import update_entities
 white_list = ['catholic', 'protestant', 'chrétien']
 
 matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
-matcher.add('RELIGION', list(nlp.pipe(white_list)))
+matcher.add('RELIGION', [nlp.make_doc(text) for text in white_list])
 
 @Language.component('ner_religion')
 def ner_religion(doc: Doc) -> Doc:
-    
+
     # Add as entity all whitelisted entity
     religions = []
     for _, start, end in matcher(doc):
+        
         # Create the span
         span = Span(doc, start, end, label='RELIGION')
 

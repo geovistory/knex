@@ -31,7 +31,7 @@ occupations_white_list = list(map(lambda text: unidecode(text),
 'Doctor',
 'Conservator',
 'General',
-'Master',
+'Butcher Master', 'Master Blacksmith', 'master tailor of crystals'
 'Advocate',
 'Restaurateur',
 'Lieutenant-Colonel',
@@ -171,5 +171,7 @@ occupations_white_list = list(map(lambda text: unidecode(text),
 'Cult Leader',
 'Vice-president of a court',
 'Carpenter',
-'Director of public customs and exchange'
+'Director of public customs and exchange',
+'Vice-président du tribunal cantonal',
+'Guardian of Convents'
 ]))

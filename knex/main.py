@@ -14,43 +14,20 @@ from .debug import debug, init_debug
 from .assertions import get_assertions
 from spacy.tokens import Doc
 
-
-class KnexOptions:    
-    def __init__(self, 
-                 reset_graph = True, 
-                 ollama_url = 'http://localhost:11434/api/generate', 
-                 model_name = 'llama3', 
-                 compute_assertions = True, 
-                 return_feedbacks = False
-                 ):
-        """
-        Create an option instance for the extraction function
-
-        Args
-        - reset_graph (bool): Start from a clean graph when executing. If this is False, it keeps the latest graph in memory in order to avoid duplicates.
-        - ollama_url (string): The Ollama server URL the LLM is going to be asked from
-        - model_name (string): which model is going to be queried.
-        - compute_assertions (bool): Whether or not to compute (ask llm) to simplify the initial text.
-        - return_feedbacks (bool): Whether or not the Return object should have the feedback string or not.
-        """
-        self.reset_graph = reset_graph
-        self.ollama_url = ollama_url
-        self.model_name = model_name
-        self.compute_assertions = compute_assertions
-        self.return_feedbacks = return_feedbacks
-
-
-
 class KnexReturn:
     graph: pd.DataFrame
     feedback: str
     assertions: List[str]
     docs: List[Doc]
-
+    
 
 def extract(
         text: str,
-        options: KnexOptions = KnexOptions(),
+        reset_graph = True,
+        ollama_url='http://localhost:11434/api/generate',
+        model_name='llama3',
+        compute_assertions=True,
+        return_feedbacks=True,
         debug_list: List[str] = [],
     ) -> KnexReturn:
     """
@@ -59,7 +36,11 @@ def extract(
     Args:
     - text (str): the text to extract the graph from.
     - debug_list (List[str]): The list of things to debug, for all, set debug=['all']
-    - options (KnexOptions): Allow to modify default options
+    - reset_graph (bool): Start from a clean graph when executing. If this is False, it keeps the latest graph in memory in order to avoid duplicates.
+    - ollama_url (string): The Ollama server URL the LLM is going to be asked from
+    - model_name (string): which model is going to be queried.
+    - compute_assertions (bool): Whether or not to compute (ask llm) to simplify the initial text.
+    - return_feedbacks (bool): Whether or not the Return object should have the feedback string or not.
 
     Return:
     Instance of KnexReturn, with different content:
@@ -70,7 +51,7 @@ def extract(
     """
 
     # init phase
-    if options.reset_graph: graph.reset() # If the graph needs to be reset or not (in case it is ran on multiple text from same corpus)
+    if reset_graph: graph.reset() # If the graph needs to be reset or not (in case it is ran on multiple text from same corpus)
     input_text = text.strip() # In case their is trailing spaces
     init_debug(debug_list) # Initialize the debuging handling
     to_return = KnexReturn()
@@ -82,20 +63,25 @@ def extract(
 
     # Compute assertions or parse them from input text
     if debug('assertions'): print(cli_bold('[KNEX] > Assertions:'))
-    if options.compute_assertions: to_return.assertions = get_assertions(text, options.ollama_url, options.model_name)
+    if compute_assertions: to_return.assertions = get_assertions(text, ollama_url, model_name)
     else: to_return.assertions = list(map(lambda sentence: sentence.text.strip(), nlp(input_text).sents))
     if debug('assertions'): [print(assertion.strip()) for assertion in to_return.assertions]
 
     # Extraction
     if debug('extraction'): print(cli_bold('[KNEX] > Extract data from assertions:'))
-    to_return.docs = list(nlp.pipe(list(map(lambda text: unidecode(text), to_return.assertions))))
-    for doc in to_return.docs: # According to spaCy documentation, this is the most efficient way of running pipeline on a string.
+
+    # clean_texts = list(map(lambda text: unidecode(text[0:text.index('->')]), to_return.assertions))
+    # to_return.docs = [nlp.make_doc(text) for text in clean_texts]
+
+    to_return.docs = list(nlp.pipe(map(lambda text: unidecode(text[0:text.index('->')]), to_return.assertions)))
+
+    for doc in to_return.docs: 
         if debug('extraction'): print(cli_bold(f'>> "{doc.text}"'))
         graph.extract(doc)
     to_return.graph = graph.to_dataframe()
 
     # Generate the feedback string 
-    if options.return_feedbacks:
+    if return_feedbacks:
         feedbacks = []
         for doc in to_return.docs:
             # Compute feedbacks

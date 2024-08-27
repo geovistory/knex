@@ -29,7 +29,7 @@ def take_wider_entities(entities):
     for i in range(0, len(entities)):
         entity1 = entities[i]
         keep = True
-        for j in range(0, len(entities)):
+        for j in range(i, len(entities)):
             if i == j: continue
             entity2 = entities[j]
 
