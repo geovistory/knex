@@ -1,2 +1,1 @@
-from .colors import colors
-from .ontology import ontology, classes, properties
+from .ontology import ontology

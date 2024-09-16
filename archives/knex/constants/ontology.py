@@ -344,7 +344,7 @@ ontology.classes.append(OntoObject(680, "Built Work", "B1"))
 ontology.classes.append(OntoObject(681, "Morphological Building Section", "B2"))
 ontology.classes.append(OntoObject(682, "Filled Morphological Building Section", "B3"))
 ontology.classes.append(OntoObject(683, "Empty Morphological Building Section", "B4"))
-ontology.classes.append(OntoObject(947, "Dimension Type", "C27"))
+ontology.classes.append(OntoObject(947, "Dimension Kind", "C27"))
 ontology.classes.append(OntoObject(831, "Teaching", "C1"))
 ontology.classes.append(OntoObject(859, "Academic Discipline", "C5"))
 ontology.classes.append(OntoObject(860, "Academic Chair", "C6"))
@@ -413,7 +413,7 @@ ontology.classes.append(OntoObject(1379, "Type of Involvement of a Thing in an E
 ontology.classes.append(OntoObject(1372, "Quantifiable Quality of a Spatio-Temporal Phenomenon", "C57"))
 ontology.classes.append(OntoObject(1380, "Link", "C62"))
 ontology.classes.append(OntoObject(1381, "Link Type", "C63"))
-ontology.classes.append(OntoObject(1383, "Purpose", "C34"))
+ontology.classes.append(OntoObject(1383, "Activity Purpose", "C34"))
 ontology.classes.append(OntoObject(1384, "Event Classification", "C64"))
 ontology.classes.append(OntoObject(1385, "Event Classification Type", "C65"))
 ontology.classes.append(OntoObject(973, "Physical Displacement", "C45"))
@@ -423,7 +423,6 @@ ontology.classes.append(OntoObject(1433, "Role in Participation Relation", "C41"
 ontology.classes.append(OntoObject(1062, "Intentional Expression", "C46"))
 ontology.classes.append(OntoObject(1064, "Intentional Expression Type", "C47"))
 ontology.classes.append(OntoObject(1775, "Quantifiable Quality of an Intentional Event", "C71"))
-ontology.classes.append(OntoObject(1781, "Quantifiable Quality of an Intentional Event Type", "C72"))
 ontology.classes.append(OntoObject(57, "Beginning of Existence", "E63"))
 ontology.classes.append(OntoObject(58, "End of Existence", "E64"))
 ontology.classes.append(OntoObject(336, "Space Primitive", "E94"))
@@ -798,7 +797,7 @@ class PkClass:
    B2_morphologicalBuildingSection = 681
    B3_filledMorphologicalBuildingSection = 682
    B4_emptyMorphologicalBuildingSection = 683
-   C27_dimensionType = 947
+   C27_dimensionKind = 947
    C1_teaching = 831
    C5_academicDiscipline = 859
    C6_academicChair = 860
@@ -867,7 +866,7 @@ class PkClass:
    C57_quantifiableQualityOfASpatioTemporalPhenomenon = 1372
    C62_link = 1380
    C63_linkType = 1381
-   C34_purpose = 1383
+   C34_activityPurpose = 1383
    C64_eventClassification = 1384
    C65_eventClassificationType = 1385
    C45_physicalDisplacement = 973
@@ -877,7 +876,6 @@ class PkClass:
    C46_intentionalExpression = 1062
    C47_intentionalExpressionType = 1064
    C71_quantifiableQualityOfAnIntentionalEvent = 1775
-   C72_quantifiableQualityOfAnIntentionalEventType = 1781
    E63_beginningOfExistence = 57
    E64_endOfExistence = 58
    E94_spacePrimitive = 336
@@ -934,7 +932,8 @@ class PkClass:
    C67_animal = 1753
    C68_biologicalObjectClassificationType = 1754
    C35_propositionalObjectType = 1768
-\classes = PkClass()
+
+classes = PkClass()
 
 ontology.properties.append(OntoObject(7, "took place on or within", "P8"))
 ontology.properties.append(OntoObject(83, "has formed", "P95"))
@@ -1304,7 +1303,7 @@ ontology.properties.append(OntoObject(1802, "overlies", "P3"))
 ontology.properties.append(OntoObject(1803, "cuts", "P4"))
 ontology.properties.append(OntoObject(1600, "is section of", "BP1"))
 ontology.properties.append(OntoObject(1742, "has quality dimension", "P35"))
-ontology.properties.append(OntoObject(1894, "has dimension type", "P25"))
+ontology.properties.append(OntoObject(1894, "has dimension kind", "P25"))
 ontology.properties.append(OntoObject(1826, "concerns", "P6"))
 ontology.properties.append(OntoObject(1827, "is carried out by", "P7"))
 ontology.properties.append(OntoObject(1828, "carried out at", "P8"))
@@ -1403,9 +1402,7 @@ ontology.properties.append(OntoObject(2370, "is role in", "P67"))
 ontology.properties.append(OntoObject(2371, "has role quality", "P68"))
 ontology.properties.append(OntoObject(1741, "has content", "P34"))
 ontology.properties.append(OntoObject(1800, "has intentional expression identifying type", "P48"))
-ontology.properties.append(OntoObject(1929, "is quality in relation to intentional event", "P60"))
 ontology.properties.append(OntoObject(2941, "is quantifiable quality of", "P89"))
-ontology.properties.append(OntoObject(2951, "has Quantifiable Quality of an Intentional Event type", "P90"))
 ontology.properties.append(OntoObject(45, "has former or current keeper", "P49"))
 ontology.properties.append(OntoObject(46, "has current keeper", "P50"))
 ontology.properties.append(OntoObject(47, "has former or current owner", "P51"))
@@ -1443,8 +1440,6 @@ ontology.properties.append(OntoObject(2380, "was embodied by", "pc42"))
 ontology.properties.append(OntoObject(2873, "shows as construction component", "pc67"))
 ontology.properties.append(OntoObject(2922, "is of biological object classification type", "P86"))
 ontology.properties.append(OntoObject(2934, "has propositional object type", "P32"))
-ontology.properties.append(OntoObject(1858, "is in relation to", "P53"))
-ontology.properties.append(OntoObject(1888, "carried out in the context of", "P56"))
 
 class PkProperty:
    P8_tookPlaceOnOrWithin = 7
@@ -1815,7 +1810,7 @@ class PkProperty:
    P4_cuts = 1803
    BP1_isSectionOf = 1600
    P35_hasQualityDimension = 1742
-   P25_hasDimensionType = 1894
+   P25_hasDimensionKind = 1894
    P6_concerns = 1826
    P7_isCarriedOutBy = 1827
    P8_carriedOutAt = 1828
@@ -1914,9 +1909,7 @@ class PkProperty:
    P68_hasRoleQuality = 2371
    P34_hasContent = 1741
    P48_hasIntentionalExpressionIdentifyingType = 1800
-   P60_isQualityInRelationToIntentionalEvent = 1929
    P89_isQuantifiableQualityOf = 2941
-   P90_hasQuantifiableQualityOfAnIntentionalEventType = 2951
    P49_hasFormerOrCurrentKeeper = 45
    P50_hasCurrentKeeper = 46
    P51_hasFormerOrCurrentOwner = 47
@@ -1954,8 +1947,6 @@ class PkProperty:
    pc67_showsAsConstructionComponent = 2873
    P86_isOfBiologicalObjectClassificationType = 2922
    P32_hasPropositionalObjectType = 2934
-   P53_isInRelationTo = 1858
-   P56_carriedOutInTheContextOf = 1888
 
 properties = PkProperty()
 

@@ -1,3 +1,3 @@
-from .entity import Entity
-from .graph import Graph
-from .triple import Triple
+from .birth import Birth
+from .death import Death
+from .religion import Religion
