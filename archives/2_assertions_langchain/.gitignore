@@ -1,5 +1,6 @@
 __pycache__/
 .DS_Store
+graph.html
 build
 dist
 knex.egg-info
