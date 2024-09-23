@@ -30,5 +30,4 @@ Commandant de la brigade légère 1, de la division 2 (1958-1961), du corps d'ar
 
 
 
-results = knex.extract(text, verbose=True)
-
+results = knex.extract(text, extraction_type='relationships', verbose=True)
