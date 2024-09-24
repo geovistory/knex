@@ -24,11 +24,6 @@ class Person(BaseModel):
     # Genealogy
     father_name: Optional[str] = Field(default=None, description="the father of the person")
     mother_name: Optional[str] = Field(default=None, description="the mother of the person")
-    
-    # Lists
-    # occupations: Optional[List[Occupation]] = Field(default=[], description="occupations of the person (job, profession, school, studies, ...)")
-    # relationships: Optional[List[Relationship]] = Field(default=[], description="the person relations (avoid parenthood relations)")
-
 
 
 def get_assertions(person: Person) -> List[str]:

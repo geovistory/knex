@@ -1,5 +1,5 @@
 from typing import List, Dict
-from knex import extract, KnexOptions
+from knex import extraction, KnexOptions
 
 class TestNER:
 
@@ -18,7 +18,7 @@ class TestNER:
         print(f'> Running NER tests "{self.name}"...', end=' ')
 
         options = KnexOptions(compute_assertions=False)
-        response = extract(self.input_text, options)
+        response = extraction(self.input_text, options)
 
         doc_entities = []
         for doc in response.docs:

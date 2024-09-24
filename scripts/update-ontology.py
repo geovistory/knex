@@ -66,21 +66,18 @@ classes = fetch_classes(profiles)
 properties = fetch_properties(profiles)
 
 # Prepare writing on disk, a python file
-path = 'knex/constants/ontology.py'
+path = 'knex/knowledge/ontology.py'
 content = """from typing import List
+from pydantic import BaseModel, Field
 
-class OntoObject:
-    def __init__(self, pk: int, label: str, id: str):
-        self.pk = pk
-        self.label = label
-        self.id = id
+class OntoObject(BaseModel):
+    pk: int
+    label: str
+    id: str
 
-class Ontology:
-    classes: List[OntoObject] = []
-    properties: List[OntoObject] = []
-
-    def __init__(self): 
-        pass
+class Ontology(BaseModel):
+    classes: List[OntoObject] = Field(default_factory=list)
+    properties: List[OntoObject] = Field(default_factory=list)
 
     def klass(self, input: int | str) -> OntoObject:
         return self.__find(self.classes, input, 'class')
@@ -101,16 +98,16 @@ ontology = Ontology()
 
 # Add all the classes
 for property in classes:
-    content += f"ontology.classes.append(OntoObject({property['pk']}, \"{property['label']}\", \"{property['id']}\"))\n"
+    content += f"ontology.classes.append(OntoObject(pk={property['pk']}, label=\"{property['label']}\", id=\"{property['id']}\"))\n"
 content += '\n'
 content += 'class PkClass:\n'
 for klass in classes:
     content += f"   {klass['id']}_{kit.camel_case(klass['label'])} = {klass['pk']}\n".replace('-', '_')
-content += '\classes = PkClass()\n\n'
+content += 'classes = PkClass()\n\n'
 
 # Add all the properties
 for property in properties:
-    content += f"ontology.properties.append(OntoObject({property['pk']}, \"{property['label']}\", \"{property['id']}\"))\n"
+    content += f"ontology.properties.append(OntoObject(pk={property['pk']}, label=\"{property['label']}\", id=\"{property['id']}\"))\n"
 content += '\n'
 content += 'class PkProperty:\n'
 for property in properties:

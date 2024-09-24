@@ -1,32 +1,36 @@
-from .person import extract_person
-from .occupations import extract_occupations
-from .relationships import extract_relationships
+from typing import Any
+from .extraction import extract_persons, extract_occupations, extract_relationships
+from .knowledge import Graph, parse_person
 
 
-def extract(text: str, extraction_type: str, verify=True, verbose=False):
+def extraction(text: str, verify=True, verbose=False):
     """
     Extract a dedicated topic from the given text.
 
     Parameters:
-    text [str]: The
+    text [str]: The text to extract information from
+    verify [bool]: either or not re-query LLM after extraction to verify assertions
+    verbose [bool]: either or not display logs during extractions
     """
 
+    to_return = {}
+    to_return['persons'] = extract_persons(text, verify, verbose)
+    # to_return['occupations'] = extract_occupations(text, verify, verbose)
+    # to_return['relationships'] = extract_relationships(text, verify, verbose)
 
-    # Extract persons from the text
-    if extraction_type.lower() == 'person':
-        return extract_person(text, verify, verbose)
-    
-    # Extract occupations from the text
-    if extraction_type.lower() == 'occupations':
-        return extract_occupations(text, verify, verbose)
-    
-    # Extract relationships from the text
-    if extraction_type.lower() == 'relationships':
-        return extract_relationships(text, verify, verbose)
-    
+    return to_return
 
 
-def extract_all(text: str, verify=True, verbose=False):
-    persons = extract_person(text, verify, verbose)
-    occupations = extract_occupations(text, verify, verbose)
-    relationships = extract_relationships(text, verify, verbose)
+def knowledge(result: Any) -> Graph:
+    """
+    Transform the extracted information into a graph
+
+    Parameters:
+    result [Any]: the extracted model from the text (output of extraction() function)
+    """
+
+    graph = Graph()
+
+    for person in result['persons']: parse_person(person, graph)
+
+    return graph

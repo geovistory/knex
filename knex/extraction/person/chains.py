@@ -6,8 +6,8 @@ from langchain_ollama import ChatOllama
 from langchain_core.runnables import RunnableLambda
 
 from .model import Person
-from ..globals import ollama_base_url, model_name
-from ..tools import obj_validation
+from ...globals import ollama_base_url, model_name
+from ...tools import obj_validation
 
 # Define the LLM used in all chains
 llm = ChatOllama(model=model_name, temperature=0, base_url=ollama_base_url)

@@ -1,5 +1,5 @@
 from typing import List
-from knex import extract, KnexOptions
+from knex import extraction, KnexOptions
 
 class TestGraph: 
 
@@ -22,7 +22,7 @@ class TestGraph:
         print(f'> Running graph tests "{self.name}"...', end=' ')
         
         options = KnexOptions(compute_assertions=self.compute_assertions)
-        response = extract(self.input_text, options)
+        response = extraction(self.input_text, options)
         values = response.graph[self.should_columns].values.tolist()
 
         # Check if the graph has everything needed

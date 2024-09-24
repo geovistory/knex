@@ -1,4 +1,3 @@
-from typing import List
 from gmpykit import print_object
 
 from .model import Relationships, get_assertions

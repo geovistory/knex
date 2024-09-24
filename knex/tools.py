@@ -10,7 +10,7 @@ def __object_validation(obj):
     if obj is None: return None
 
     # List of unwanted values given by the LLM
-    forbidden = ['', 'unknown', 'unspecified']
+    forbidden = ['', 'unknown', 'unspecified', 'na', 'none']
 
     # If the object is just a value, check it directly
     if isinstance(obj, int) or isinstance(obj, str) or isinstance(obj, float) or isinstance(obj, bool):
