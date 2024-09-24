@@ -1,5 +1,5 @@
 from ...extraction import Person
-from ..model import Graph
+from ..graph import Graph
 from ..ontology import properties, classes
 
 def parse_person(person: Person, graph: Graph):
@@ -17,8 +17,9 @@ def parse_person(person: Person, graph: Graph):
     # Name
     if person.name:
         paiail = graph.create_entity(pk_class=classes.C38_personAppellationInALanguage, label=person.name)
+        appe = graph.create_entity(pk_class=classes.E41_appellation, label=person.name)
         graph.create_triple(paiail, properties.P11_isAppellationForLanguageOf, person_ent)
-        graph.create_triple(paiail, properties.P13_refersToName, person.name)
+        graph.create_triple(paiail, properties.P13_refersToName, appe)
 
     # Gender
     if person.gender:
@@ -37,10 +38,10 @@ def parse_person(person: Person, graph: Graph):
 
     # Birth date
     if person.birth_date:
-        date = tuple(map(lambda string: int(string), person.birth_date.split('.')))
         birth = graph.create_entity(classes.E67_birth, person.name)
+        date = graph.create_entity(classes.E61_timePrimitive, person.birth_date)
         graph.create_triple(birth, properties.P98_broughtIntoLife, person_ent)
-        graph.create_triple(birth, properties.P82_atSomeTimeWithin, str(date))
+        graph.create_triple(birth, properties.P82_atSomeTimeWithin, date)
 
     # Birth place
     if person.birth_place:
@@ -51,10 +52,10 @@ def parse_person(person: Person, graph: Graph):
 
     # Death date
     if person.death_date:
-        date = tuple(map(lambda string: int(string), person.death_date.split('.')))
         death = graph.create_entity(classes.E69_death, person.name)
+        date = graph.create_entity(classes.E61_timePrimitive, person.death_date)
         graph.create_triple(death, properties.P100_wasDeathOf, person_ent)
-        graph.create_triple(death, properties.P82_atSomeTimeWithin, str(date))
+        graph.create_triple(death, properties.P82_atSomeTimeWithin, date)
 
     # Death place
     if person.death_place:

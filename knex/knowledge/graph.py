@@ -1,7 +1,10 @@
 from typing import List, Any
 from pydantic import BaseModel
+from pyvis.network import Network
 import pandas as pd
 from .ontology import OntoObject, ontology as onto, properties, classes
+from .colors import colors
+
 
 
 class Entity(BaseModel):
@@ -10,10 +13,12 @@ class Entity(BaseModel):
     label: str
 
 
+
 class Triple(BaseModel):
     subject: Entity
     property: OntoObject
-    object: Entity | str
+    object: Entity
+
 
 
 class Graph(BaseModel):
@@ -23,8 +28,11 @@ class Graph(BaseModel):
     pk_index: int = 1
 
 
+
     def get_current_index(self):
         return self.pk_index
+
+
 
     def create_entity(self, pk_class: int, label: str) -> Entity:
         """
@@ -50,7 +58,8 @@ class Graph(BaseModel):
             return filtered[0]
         
 
-    def create_triple(self, subject: Entity, property: int, object: Entity | str) -> None:
+
+    def create_triple(self, subject: Entity, property: int, object: Entity) -> None:
         """
         Create or get the triple from given informations.
 
@@ -61,19 +70,13 @@ class Graph(BaseModel):
         """
     
         # Look in memory if we have an existing entity
-        def is_same_triple(triple: Triple):
-            if triple.subject.pk != subject.pk: return False
-            if triple.property.pk != property: return False
-            if type(object) != type(triple.object): return False
-            if isinstance(object, Entity) and isinstance(triple.object, Entity) and object.pk != triple.object.pk: return False
-            if isinstance(object, str) and isinstance(triple.object, str) and object != triple.object: return False
-            return True
-        filtered = list(filter(is_same_triple, self.triples))
+        filtered = list(filter(lambda t: t.subject.pk == subject.pk and t.property.pk == property and t.object.pk == object.pk, self.triples))
 
         # If there is none, create it
         if len(filtered) == 0:
             triple = Triple(subject=subject, property=onto.property(property), object=object)
             self.triples.append(triple)
+
 
 
     def create_entity_aial(self, pk_class: int, name: str):
@@ -91,14 +94,18 @@ class Graph(BaseModel):
         # Create the Appellation in a Language
         aial = self.create_entity(classes.C11_appellationInALanguage, name)
 
+        # Create the Appellation
+        appe = self.create_entity(classes.E41_appellation, name)
+
         # Link the Appellation in a Language with the Entity
         self.create_triple(aial, properties.P11_isAppellationForLanguageOf, entity)
 
         # Create the name of the entity (value)
-        self.create_triple(aial, properties.P13_refersToName, name)
+        self.create_triple(aial, properties.P13_refersToName, appe)
 
         return entity
     
+
 
     def dataframes(self):
         """Return the entities and triples as DataFrames"""
@@ -108,6 +115,7 @@ class Graph(BaseModel):
 
         return pd.DataFrame(entities), pd.DataFrame(triples)
     
+
 
     def to_dataframe(self):
         """Transform the graph object into a global dataframe"""
@@ -120,16 +128,65 @@ class Graph(BaseModel):
 
         df = triples.merge(entities, left_on='subject', right_on='pk', how='left') \
                         .drop(columns=['pk']) \
-                        .rename(columns={'pk_class': 'subject_pk_class', 'class_label': 'subject_class_label', 'label': 'subject_label', 'display': 'subject_display'}) \
+                        .rename(columns={'pk_class': 'subject_class_pk', 'class_label': 'subject_class_label', 'label': 'subject_label', 'display': 'subject_display'}) \
                     .merge(entities, left_on='object', right_on='pk', how='left') \
                         .drop(columns=['pk']) \
-                        .rename(columns={'pk_class': 'object_pk_class', 'class_label': 'object_class_label', 'label': 'object_label', 'display': 'object_display'}) \
+                        .rename(columns={'pk_class': 'object_class_pk', 'class_label': 'object_class_label', 'label': 'object_label', 'display': 'object_display'}) \
         
 
         columns = [
-            'subject', 'subject_pk_class', 'subject_class_label', 'subject_label', 'subject_display',
+            'subject', 'subject_class_pk', 'subject_class_label', 'subject_label', 'subject_display',
             'property', 'property_label',
-            'object', 'object_pk_class', 'object_class_label', 'object_label', 'object_display',
+            'object', 'object_class_pk', 'object_class_label', 'object_label', 'object_display',
         ]
+        df = df[columns]
+
+        df['subject_class_pk'] = df['subject_class_pk'].astype(pd.Int64Dtype())
+        df['object_class_pk'] = df['object_class_pk'].astype(pd.Int64Dtype())
 
         return df[columns]
+
+
+
+    def get_visuals(self, path: str):
+        """Generate a html file with a graph visual, and save it at the given place"""
+
+        graph = self.to_dataframe()
+        if len(graph) == 0: return
+
+        # A bit of formating
+        graph['subject_display'] = graph['subject_display'].str.replace(' - ', '\n') 
+        graph['object_display'] = graph['object_display'].str.replace(' - ', '\n') 
+
+        # Add node colors:
+        graph['subject_color'] = [colors[klass] if pd.notna(klass) else '#000' for klass in graph['subject_class_pk']]
+        graph['object_color'] = [colors[klass] if pd.notna(klass) else '#000' for klass in graph['object_class_pk']]
+
+        # Extract nodes
+        nodes_subject = graph[['subject', 'subject_display', 'subject_color']].drop_duplicates(subset=['subject'])
+        nodes_object = graph[['object', 'object_display', 'object_color']].drop_duplicates(subset=['object'])
+    
+        # Add the node to the network
+        network = Network(height=750, width=1500, notebook=False, cdn_resources='remote')
+        network.add_nodes(nodes_subject['subject_display'].tolist(), color=nodes_subject['subject_color'].tolist())
+        network.add_nodes(nodes_object['object_display'].tolist(), color=nodes_object['object_color'].tolist())
+
+        # Add the edges
+        for _, row in graph.iterrows():
+            network.add_edge(str(row['subject_display']), str(row['object_display']), label=row['property_label'])
+
+        # Set the options
+        network.set_options("""
+            const options = {
+                "nodes": {"font": {"face": "tahoma"}},
+                "edges": {
+                    "arrows": {"to": {"enabled": true}},
+                    "font": {"size": 10,"face": "tahoma","align": "top"}
+                }
+            }
+        """)
+
+
+        # Generating the file
+        # network.show_buttons(filter_=['physics'])
+        network.show(path, local=True, notebook=False)
