@@ -1,1 +1,1 @@
-from .main import extraction, knowledge
+from .main import extraction, knowledge, knowledge_extraction

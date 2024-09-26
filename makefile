@@ -30,5 +30,5 @@ update-ontology:
 	@python3.10 ./scripts/update-ontology.py
 
 
-llmlog:
-	@python3.10 ./scripts/llm-logging.py
+llm-proxy:
+	@python3.10 ./scripts/reverse-proxy-llm.py

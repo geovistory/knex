@@ -1,9 +1,21 @@
 from flask import Flask, request, jsonify
-import requests
-import json
+import requests, json, os
 
 app = Flask(__name__)
 ollama_server_url = "http://localhost:11434"  # URL of the Ollama server
+input_logs_path = './llm-inputs.log'
+output_logs_path = './llm-outputs.log'
+
+# Clean existing input/output files
+if os.path.exists(input_logs_path): os.remove(input_logs_path)
+if os.path.exists(output_logs_path): os.remove(output_logs_path)
+
+# Create outputs logs
+f = open(input_logs_path, 'w')
+f.close()
+f = open(output_logs_path, 'w')
+f.close()
+
 
 @app.route('/<path:path>', methods=['POST', 'GET'])
 def log_request(path):
@@ -22,7 +34,11 @@ def log_request(path):
         print('>>>>>>>>>> MESSAGES <<<<<<<<<<')
         messages = request.json['messages']
         for message in messages:
-            print(message['role'].upper() + ':', message['content'])
+            text = message['role'].upper() + ': ' + message['content']
+            print(text)
+            f = open(input_logs_path, 'a')
+            f.write(text + '\n\n')
+            f.close()
 
 
     # Manually set the stream attribute to false for every request
@@ -52,7 +68,11 @@ def log_request(path):
         print(json.dumps(message['tool_calls'], indent=4))
     print()
     print('>>>>>>>>>> MESSAGES <<<<<<<<<<')
-    print(message['role'].upper() + ':', message['content'])
+    text = message['role'].upper() + ': ' + message['content']
+    print(text)
+    f = open(output_logs_path, 'a')
+    f.write(text + '\n\n')
+    f.close()
     print()      
 
 

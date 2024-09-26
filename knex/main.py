@@ -1,4 +1,5 @@
 from typing import Dict
+import pandas as pd
 from .extraction import extract_names, extract_persons, extract_activities, extract_relationships
 from .knowledge import Graph, parse_person, parse_activity, parse_relationship
 
@@ -44,4 +45,33 @@ def knowledge(result: Dict) -> Graph:
             parse_relationship(relationship, graph)
 
     return graph
+
+
+
+def knowledge_extraction(text: str, verify=False, verbose=False, output_csv:str=None, output_html:str=None) -> pd.DataFrame:
+    """
+    Run the full pipeline on the given text:
+        1/ Extract the information from the text and transform it into Python classes instances
+        2/ Transform the Python classes instance into a graph (respecting the ontology)
+
+    Parameters:
+    text [str]: The text to run the pipeline on
+    output_csv [str]: If specified, will save the resulting graph in a CSV file, at the given path.
+    output_html [str]: If specified, will save the resulting graph in a nice and shiny visual, allowing to see the graph in an interactive way.
+    verify [bool]: This option allows to ask if every assumption is correct or not. At the moment doe nothing else than to print log.
+    verbose [bool]: If True, the pipeline will display all information in the logs (only for extraction step).
+
+    Return [pandas.DataFrame]: The resulting graph
+    """
+
+
+    extracted = extraction(text, verify, verbose)
+    graph = knowledge(extracted)
+    dataframe = graph.to_dataframe()
+
+    if output_csv: dataframe.to_csv(output_csv, index=False)
+    if output_html: graph.get_visuals(output_html)
+
+
+    return dataframe
 
