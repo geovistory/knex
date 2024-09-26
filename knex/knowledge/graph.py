@@ -2,7 +2,7 @@ from typing import List, Any
 from pydantic import BaseModel
 from pyvis.network import Network
 import pandas as pd
-from .ontology import OntoObject, ontology as onto, properties, classes
+from .ontology import OntoObject, ontology as onto, properties as p, classes as c
 from .colors import colors
 
 
@@ -92,16 +92,18 @@ class Graph(BaseModel):
         entity = self.create_entity(pk_class, name)
 
         # Create the Appellation in a Language
-        aial = self.create_entity(classes.C11_appellationInALanguage, name)
+        if pk_class == c.E21_person: klass = c.C38_personAppellationInALanguage
+        else: klass = c.C11_appellationInALanguage
+        aial = self.create_entity(klass, name)
 
         # Create the Appellation
-        appe = self.create_entity(classes.E41_appellation, name)
+        appe = self.create_entity(c.E41_appellation, name)
 
         # Link the Appellation in a Language with the Entity
-        self.create_triple(aial, properties.P11_isAppellationForLanguageOf, entity)
+        self.create_triple(aial, p.P11_isAppellationForLanguageOf, entity)
 
         # Create the name of the entity (value)
-        self.create_triple(aial, properties.P13_refersToName, appe)
+        self.create_triple(aial, p.P13_refersToName, appe)
 
         return entity
     
@@ -121,6 +123,8 @@ class Graph(BaseModel):
         """Transform the graph object into a global dataframe"""
 
         entities, triples = self.dataframes()
+        if len(entities) == 0: return pd.DataFrame()
+
 
         entities['class_label'] = [onto.klass(pk_class).label for pk_class in entities['pk_class']]
         entities['display'] =  [row['class_label'] + ' - ' + row['label'] for _, row in entities.iterrows()]

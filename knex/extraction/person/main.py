@@ -2,26 +2,21 @@ from typing import List
 from gmpykit import print_object
 
 from .model import Person, get_assertions
-from .chains import list_person_chain, extraction_chain, verification_chain
+from .chains import extraction_chain, verification_chain
 
 
-def extract_persons(text: str, verify: bool, verbose) -> List[Person]:
+def extract_persons(text: str, persons_names: List[str], verify: bool, verbose: bool) -> List[Person]:
     """
     Given the text, extract information about all persons found in it.
     If the option is set, make a second call to LLM to check the truthfulness of extracted information.
     """
 
     results = []
-
-    # Get all persons from the text
-    persons_names = list_person_chain.invoke({'text': text})
-    if verbose: print("Persons found in the text:", ', '.join(persons_names))
-
     # Extract information about all persons
     for person_name in persons_names:
 
         # Extract the information
-        if verbose: print("\nExtracting information about:", person_name)
+        if verbose: print("\n==== Extracting information about:", person_name, "====")
         person = extraction_chain.invoke({'person_name': person_name, 'text': text})
         if verbose: print_object(person)
 

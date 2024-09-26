@@ -5,7 +5,7 @@ from langchain_core.messages.ai import AIMessage
 from langchain_ollama import ChatOllama
 from langchain_core.runnables import RunnableLambda
 
-from .model import Person
+from .model import Activities
 from ...globals import ollama_base_url, model_name
 from ...globals import system_prompt_extraction, system_prompt_verification
 from ..tools import obj_validation
@@ -20,12 +20,12 @@ llm = ChatOllama(model=model_name, temperature=0, base_url=ollama_base_url)
 ######################################
 
 # Chain element: Parser
-parser = PydanticOutputParser(pydantic_object=Person)
+parser = PydanticOutputParser(pydantic_object=Activities)
 
 # Chain element: Prompt
 extracting_prompt = ChatPromptTemplate.from_messages([
         ("system", system_prompt_extraction),
-        ("human", "What information do we know about {person_name}?")
+        ("human", "What information do we know about {person_name} professional activities (or formation)?")
 ]).partial(format_instructions=parser.get_format_instructions())
 
 # Build the chain

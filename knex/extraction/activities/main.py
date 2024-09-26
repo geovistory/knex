@@ -1,13 +1,13 @@
 from typing import List
 from gmpykit import print_object
 
-from .model import Relationships, Relationship, get_assertions
+from .model import Activities, Activity, get_assertions
 from .chains import extraction_chain, verification_chain
 
 
-def extract_relationships(text: str, persons_names: List[str], verify: bool, verbose: bool) -> List[Relationship]:
+def extract_activities(text: str, persons_names: List[str], verify: bool, verbose: bool) -> List[Activity]:
     """
-    Given the text, extract information about person's relationships found in it.
+    Given the text, extract information about person's activities found in it.
     If the option is set, make a second call to LLM to check the truthfulness of extracted information.
     """
 
@@ -16,20 +16,20 @@ def extract_relationships(text: str, persons_names: List[str], verify: bool, ver
     for person_name in persons_names:
 
         # Extract the information
-        if verbose: print("\n=== Extracting relationships of:", person_name, "===")
-        relationships = extraction_chain.invoke({'person_name': person_name, 'text': text})
-        if verbose: print_object(relationships)
+        if verbose: print("\n=== Extracting activities of:", person_name, "===")
+        activities = extraction_chain.invoke({'person_name': person_name, 'text': text})
+        if verbose: print_object(activities)
 
         # Verify extracted information
         if verify:
-            relationships = __verify(text, relationships, verbose)
+            activities = __verify(text, activities, verbose)
         
-        results += relationships.relationships
+        results += activities.activities
     return results
 
 
 
-def __verify(text: str, relationships: Relationships, verbose: bool):
+def __verify(text: str, activities: Activities, verbose: bool):
     """
     Given the text and the extracted information, ask the LLM for each information
     if it is true or not. 
@@ -37,7 +37,7 @@ def __verify(text: str, relationships: Relationships, verbose: bool):
     """
 
     # Get the person assertions
-    assertions = get_assertions(relationships)
+    assertions = get_assertions(activities)
 
     # Verify each assertion
     if verbose: print('\nVerifications:')
@@ -47,4 +47,4 @@ def __verify(text: str, relationships: Relationships, verbose: bool):
         if verbose or not verification: 
             print('>> ' + assertion + ' ---> ' + str(verification))
 
-    return relationships
+    return activities

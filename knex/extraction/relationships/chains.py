@@ -7,7 +7,8 @@ from langchain_core.runnables import RunnableLambda
 
 from .model import Relationships
 from ...globals import ollama_base_url, model_name
-from ...tools import obj_validation
+from ...globals import system_prompt_extraction, system_prompt_verification
+from ..tools import obj_validation
 
 # Define the LLM used in all chains
 llm = ChatOllama(model=model_name, temperature=0, base_url=ollama_base_url)
@@ -23,16 +24,8 @@ parser = PydanticOutputParser(pydantic_object=Relationships)
 
 # Chain element: Prompt
 extracting_prompt = ChatPromptTemplate.from_messages([
-        ("system",
-            "You are an expert extraction algorithm. "
-            "From the context, answer the user query, and wrap the output in ```json and ``` tags. "
-            "Dates should be formated as such: yyyy.mm.dd, or yyyy.mm.00 or yyyy.00.00. "
-            "{format_instructions}.\n\n"
-            "Context:\n{text}"
-        ),
-        ("human", 
-            "Extract all relationships between 2 persons from the context."
-        )
+        ("system", system_prompt_extraction),
+        ("human", "What information do we know about {person_name} relationships? Avoid parent-child relations.")
 ]).partial(format_instructions=parser.get_format_instructions())
 
 # Build the chain
@@ -46,16 +39,8 @@ extraction_chain = extracting_prompt | llm | parser | obj_validation
 
 # Chain element: Prompt
 verification_prompt = ChatPromptTemplate.from_messages([
-        ("system", 
-            "You are an expert and strict verificator. "
-            "From the context, answer the user query using 'True' or 'False'. "
-            "Your answer should be a single word.\n"
-            "Context:\n{text}"
-        ),
-        ("human", 
-            "Is the assertion '{assertion}' true? "
-            "If it is not clearly known or said, the answer should be 'False'"
-        )
+        ("system", system_prompt_verification),
+        ("human", "Is the assertion '{assertion}' true? If it is not clearly stated, the answer should be 'False'.")
 ])
 
 # Verify the format

@@ -39,7 +39,5 @@ def get_assertions(person: Person) -> List[str]:
     if person.death_place: assertions.append(f"{person.name} died in {person.death_place}.")
     if person.father_name: assertions.append(f"{person.name} is the child of {person.father_name}.")
     if person.mother_name: assertions.append(f"{person.name} is the child of {person.mother_name}.")
-    # for occupation in person.occupations:
-    #     assertions += get_occupation_assertions(occupation, person.name)
 
     return assertions
