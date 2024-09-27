@@ -1,77 +1,81 @@
-from typing import Dict
-import pandas as pd
-from .extraction import extract_names, extract_persons, extract_activities, extract_relationships
-from .knowledge import Graph, parse_person, parse_activity, parse_relationship
+from typing import List
 
-def extraction(text: str, verify=True, verbose=False):
+from .schema import Information, Graph
+from .extraction import extract_names, extract_persons, extract_activities, extract_relationships
+from .knowledge import person_to_graph, activity_to_graph, relationship_to_graph
+
+
+def extraction(text: str, verify: bool = False, verbose: bool = False) -> Information:
     """
     Extract a dedicated topic from the given text.
 
-    Parameters:
-    text [str]: The text to extract information from
-    verify [bool]: either or not re-query LLM after extraction to verify assertions
-    verbose [bool]: either or not display logs during extractions
+    Args:
+        text (str): The text to extract information from.
+        verify (bool): This option allows to ask if every assumption is correct or not (requery LLM). At the moment do nothing else than to print log.
+        verbose (bool): either or not display logs during extractions.
+
+    Return:
+        KnexResult: an instance that regroups all result of this library.
     """
 
-    to_return = {}
-    to_return['names'] = extract_names(text, verify, verbose)
-    to_return['persons'] = extract_persons(text, to_return['names'], verify, verbose)
-    to_return['activities'] = extract_activities(text, to_return['names'], verify, verbose)
-    to_return['relationships'] = extract_relationships(text, to_return['names'], verify, verbose)
+    extracted = Information()
+    extracted.persons_names = extract_names(text, verify, verbose)
+    extracted.persons = extract_persons(text, extracted.persons_names, verify, verbose)
+    extracted.activities = extract_activities(text, extracted.persons_names, verify, verbose)
+    extracted.relationships = extract_relationships(text, extracted.persons_names, verify, verbose)
+    return extracted
 
-    return to_return
 
-
-def knowledge(result: Dict) -> Graph:
+def knowledge(information: Information, graph: Graph = None) -> Graph:
     """
-    Transform the extracted information into a graph
+    Transform the extracted information into a graph.
 
-    Parameters:
-    result [Any]: the extracted model from the text (output of extraction() function)
+    Args:
+        information (Information): the extracted model from the text (output of extraction() function).
+        graph (Graph): if a graph is specified, add the information to the given one, otherwise create a new one.
+
+    Returns:
+        Graph: the populated graph.
     """
 
-    graph = Graph()
+    if not graph: graph = Graph()
 
-    if 'persons' in result.keys(): 
-        for person in result['persons']: 
-            parse_person(person, graph)
+    # Add all persons to the graph
+    if information.persons and len(information.persons) > 0:
+        for person in information.persons:
+            person_to_graph(person, graph)
 
-    if 'activities' in result.keys(): 
-        for activity in result['activities']: 
-            parse_activity(activity, graph)
+    # Add all activities to the graph
+    if information.activities and len(information.activities) > 0:
+        for activity in information.activities:
+            activity_to_graph(activity, graph)
 
-    if 'relationships' in result.keys(): 
-        for relationship in result['relationships']: 
-            parse_relationship(relationship, graph)
+    # Add all relationships to the graph
+    if information.relationships and len(information.relationships) > 0:
+        for relationship in information.relationships:
+            relationship_to_graph(relationship, graph)
+            
 
     return graph
 
 
-
-def knowledge_extraction(text: str, verify=False, verbose=False, output_csv:str=None, output_html:str=None) -> pd.DataFrame:
+def knowledge_extraction(text: str, graph: Graph = None, verify: bool = False, verbose: bool = False) -> Graph:
     """
     Run the full pipeline on the given text:
-        1/ Extract the information from the text and transform it into Python classes instances
-        2/ Transform the Python classes instance into a graph (respecting the ontology)
+    1/ Extract the information from the text and transform it into Python classes instances.
+    2/ Transform the Python classes instance into a graph (respecting the ontology).
 
-    Parameters:
-    text [str]: The text to run the pipeline on
-    output_csv [str]: If specified, will save the resulting graph in a CSV file, at the given path.
-    output_html [str]: If specified, will save the resulting graph in a nice and shiny visual, allowing to see the graph in an interactive way.
-    verify [bool]: This option allows to ask if every assumption is correct or not. At the moment doe nothing else than to print log.
-    verbose [bool]: If True, the pipeline will display all information in the logs (only for extraction step).
+    Args:
+        text (str): The text to run the pipeline on.
+        graph (Graph): if a graph is specified, add the information to the given one, otherwise create a new one.
+        verify (bool): This option allows to ask if every assumption is correct or not. At the moment do nothing else than to print log.
+        verbose (bool): If True, the pipeline will display all information in the logs (only for extraction step).
 
-    Return [pandas.DataFrame]: The resulting graph
+    Returns:
+        pandas.DataFrame: The resulting graph.
     """
 
+    information = extraction(text, verify, verbose)
+    graph = knowledge(information, graph)
 
-    extracted = extraction(text, verify, verbose)
-    graph = knowledge(extracted)
-    dataframe = graph.to_dataframe()
-
-    if output_csv: dataframe.to_csv(output_csv, index=False)
-    if output_html: graph.get_visuals(output_html)
-
-
-    return dataframe
-
+    return graph

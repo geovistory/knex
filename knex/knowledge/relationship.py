@@ -1,10 +1,14 @@
-from ...extraction import Relationship
-from ..graph import Graph
-from ..ontology import properties as p, classes as c
+from ..schema import Graph, Relationship
+from ..constants import properties as p, classes as c
 
-def parse_relationship(relationship: Relationship, graph: Graph):
+
+def relationship_to_graph(relationship: Relationship, graph: Graph):
     """
     Transform an object instance into a list of entities and statements.
+
+    Args:
+        relationship (Relationship): the relationship to be added to the graph.
+        graph (Graph): the graph to add the relationship to.
     """
 
     # Take only the ones we want to
@@ -30,7 +34,6 @@ def parse_relationship(relationship: Relationship, graph: Graph):
     # The relationship type
     rel_type = graph.create_entity_aial(c.C10_typeOfPersonsInteraction, relationship.relationship_type.capitalize())
     graph.create_triple(relationship_ent, p.P21_hasTypeOfInteraction, rel_type)
-
 
     # Timing information
     if relationship.date_begin:

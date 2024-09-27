@@ -2,6 +2,8 @@ from typing import Optional, List
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 
+# This class is to be given to a LLM.
+# Classes descriptions, attributes names, fields description should be set thoroughly.
 class Person(BaseModel):
     """
     Information from the text about a person.
@@ -26,8 +28,16 @@ class Person(BaseModel):
     mother_name: Optional[str] = Field(default=None, description="the mother of the person")
 
 
-def get_assertions(person: Person) -> List[str]:
-    """List all assertions from the extracted Person"""
+def get_person_assertions(person: Person) -> List[str]:
+    """
+    Produce the assertion for a Person
+    
+    Args: 
+        person (Person): a person object
+
+    Returns:
+        List[str]: the list of assertions from the given Person
+    """
 
     assertions = []
     if person.gender: assertions.append(f"{person.name} is a {person.gender}.")

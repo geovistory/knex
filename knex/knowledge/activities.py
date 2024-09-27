@@ -1,10 +1,14 @@
-from ...extraction import Activities, Activity
-from ..graph import Graph
-from ..ontology import properties as p, classes as c
+from ..schema import Graph, Activity
+from ..constants import properties as p, classes as c
 
-def parse_activity(activity: Activity, graph: Graph):
+
+def activity_to_graph(activity: Activity, graph: Graph) -> None:
     """
     Transform an object instance into a list of entities and statements.
+
+    Args:
+        activity (Activity): the activity to be added to the graph.
+        graph (Graph): the graph to add the activity to.
     """
 
     # If the activity or person does not have a name, set a default value
@@ -41,7 +45,6 @@ def parse_activity(activity: Activity, graph: Graph):
             company = graph.create_entity_aial(c.E74_group, activity.institution)
             graph.create_triple(occupation_teen, p.P7_onBehalfOf, company)
 
-
     # In case of a Social Role
     if activity.activity_type == 'social role':
         social_role = graph.create_entity_aial(c.C12_actorSSocialRole, activity.name)
@@ -67,9 +70,7 @@ def parse_activity(activity: Activity, graph: Graph):
             institution = graph.create_entity_aial(c.E74_group, activity.institution)
             graph.create_triple(social_role_emb, p.P56_carriedOutInTheContextOf, institution)
 
-
-
-    # In case of a Social Role
+    # In case of a Formation
     if activity.activity_type == 'formation':
         study = graph.create_entity(c.C2_study, activity.name)
         graph.create_triple(study, p.P2_isTheStudyBy, person)

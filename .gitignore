@@ -1,8 +1,17 @@
-__pycache__/
+
+# Mac OS related
 .DS_Store
+
+
+# Python related
+__pycache__/
+
+# Package related
 build
 dist
 knex.egg-info
-graph.csv
-graph.html
+
+# Generated files
+*.csv
+*.html
 *.log

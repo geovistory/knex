@@ -1,10 +1,7 @@
-model_name = "llama3.1"
-# ollama_base_url = "http://localhost:11434" # Direct Ollama
-ollama_base_url = "http://127.0.0.1:5000" # Through the reverse proxy
 
 
-
-system_prompt_extraction = """
+# This prompt is used to extract information from a given text
+prompt_system_extraction = """
 You are an expert extraction algorithm.
 From the context, answer the user query, and wrap the output in ```json and ``` tags.
 Dates should be formated as such: yyyy.mm.dd, or yyyy.mm.00 or yyyy.00.00.
@@ -16,7 +13,8 @@ Context:
 """.strip()
 
 
-system_prompt_verification = """
+# This prompt is used in the verification chain, to verify information from a given text
+prompt_system_verification = """
 You are an expert verificator.
 From the context, answer the user query using 'True' or 'False'.
 Your answer should be a single word.
@@ -24,3 +22,4 @@ Your answer should be a single word.
 Context:
 {text}
 """.strip()
+

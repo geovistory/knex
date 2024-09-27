@@ -1,7 +1,9 @@
 from typing import Optional, List
-from enum import Enum
 from langchain_core.pydantic_v1 import BaseModel, Field
 
+
+# This class is to be given to a LLM.
+# Classes descriptions, attributes names, fields description should be set thoroughly.
 class Relationship(BaseModel):
     """
     Information about relationship between two persons.
@@ -15,15 +17,24 @@ class Relationship(BaseModel):
     relationship_type: Optional[str] = Field(default=None, description="exclusively one of: romantic, marriage, friendship, mentorship, colleagues")
 
 
+# This class is to be given to a LLM.
+# Class description, fields description should be set accordingly.
 class Relationships(BaseModel):
     """List of relationships mentioned in the context"""
 
     relationships: List[Relationship] = Field(default=[], description="list of all relationships mentioned in the text")
 
 
+def get_relationships_assertions(relationships: Relationships) -> List[str]:
+    """
+    Produce the assertion for Relationships
+    
+    Args: 
+        relationships (Relationships): An object having a list of relationships
 
-def get_assertions(relationships: Relationships) -> List[str]:
-    """List all assertions from the extracted Occupation"""
+    Returns:
+        List[str]: the list of assertions from the given relationships
+    """
 
     assertions = []
     for rlt in relationships.relationships:

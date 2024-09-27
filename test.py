@@ -26,11 +26,23 @@ Commandant de la brigade légère 1, de la division 2 (1958-1961), du corps d'ar
 # Conseiller juridique de Brown Boveri et de la SA Motor (administrateur de 1896 à 1902), administrateur de la centrale électrique de Hagneck (président dès 1898), de la Société d'électricité de Baden (1903-1905) et des chemins de fer du Nord-Est (1894-1902). 
 # Armin Kellersberger et son beau-fils Alfred Meyer entreprirent des fouilles sur leur propriété de Baden (1894-1898), qui mirent au jour des vestiges romains remarquables. 
 # Grâce à son esprit de conciliation et à son large champ d'activités, tant juridiques que politiques, Armin Kellersberger fut l'un des politiciens argoviens les plus estimés de son temps.
-# """
+# """.strip()
+
+
+graph = 
 
 
 
-knex.knowledge_extraction(text, verify=False, verbose=True, output_csv="graph.csv", output_html="graph.html")
+extract = knex.extraction(text, verify=False, verbose=True)
+tables = knex.extraction_to_tables(extract)
+
+tables.to_csv('./persons.csv')
+
+
+
+# knex.knowledge_extraction(text, verify=False, verbose=True, output_csv="graph.csv", output_html="graph.html")
+
+
 
 # results = knex.extraction(text, verbose=True, verify=False)
 # graph = knex.knowledge(results)

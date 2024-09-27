@@ -1,10 +1,8 @@
-from typing import List, Any
+from typing import List, Tuple
 from pydantic import BaseModel
 from pyvis.network import Network
 import pandas as pd
-from .ontology import OntoObject, ontology as onto, properties as p, classes as c
-from .colors import colors
-
+from ..constants import OntoObject, ontology as onto, properties as p, classes as c, colors
 
 
 class Entity(BaseModel):
@@ -13,12 +11,10 @@ class Entity(BaseModel):
     label: str
 
 
-
 class Triple(BaseModel):
     subject: Entity
     property: OntoObject
     object: Entity
-
 
 
 class Graph(BaseModel):
@@ -28,19 +24,27 @@ class Graph(BaseModel):
     pk_index: int = 1
 
 
+    def get_current_index(self) -> int:
+        """
+        Return the index of the next created entity.
+        Usefull for example to set a unique label to an entity.
 
-    def get_current_index(self):
+        Returns: 
+            int: The pk given to the next entity.
+        """
         return self.pk_index
-
 
 
     def create_entity(self, pk_class: int, label: str) -> Entity:
         """
         Create or get the entity with given informations.
 
-        Parameter:
-        pk_class [int]: The class of the entity to create/get
-        label [str]: The label of the entity to create/get
+        Args:
+            pk_class (int): The class of the entity to create/get.
+            label (str): The label of the entity to create/get.
+
+        Returns:
+            Entity: The entity that has been created (or fetched).
         """
 
         # Look in memory if we have an existing entity
@@ -58,15 +62,14 @@ class Graph(BaseModel):
             return filtered[0]
         
 
-
     def create_triple(self, subject: Entity, property: int, object: Entity) -> None:
         """
-        Create or get the triple from given informations.
+        Create the triple from given informations, if it does not already exist.
 
-        Parameter:
-        subject [Entity]: the subject entity
-        property [int]: the property to link
-        object [Entity]: the object entity
+        Args:
+            subject (Entity): the subject entity.
+            property (int): the property to link.
+            object (Entity): the object entity.
         """
     
         # Look in memory if we have an existing entity
@@ -78,14 +81,16 @@ class Graph(BaseModel):
             self.triples.append(triple)
 
 
-
-    def create_entity_aial(self, pk_class: int, name: str):
+    def create_entity_aial(self, pk_class: int, name: str) -> Entity:
         """
         Shortcut to create an entity and add an appellation in a language with the given name.
 
-        Parameter:
-        pk_class [int]: the entity to create an AiaL for
-        name [str]: the name to give the entity (label and refersToName triple)
+        Args:
+            pk_class (int): the entity to create an AiaL for.
+            name (str): the name to give to the entity (label and refersToName triple).
+
+        Returns:
+            Entity: The entity that has been created (or fetched).
         """
 
         # Create the entity
@@ -108,9 +113,13 @@ class Graph(BaseModel):
         return entity
     
 
-
-    def dataframes(self):
-        """Return the entities and triples as DataFrames"""
+    def dataframes(self) -> Tuple[pd.DataFrame]:
+        """
+        Return the entities and triples as DataFrames.
+        
+        Returns:
+            Tuple[pd.DataFrame]: A tuple of length 2 with at first the entities df, and second triples df.
+        """
 
         entities = list(map(lambda entity: ({'pk': entity.pk, 'pk_class': entity.klass.pk, 'label': entity.label}), self.entities))
         triples = list(map(lambda triple: ({'subject': triple.subject.pk, 'property': triple.property.pk, 'object': triple.object.pk if isinstance(triple.object, Entity) else triple.object}), self.triples))
@@ -118,9 +127,13 @@ class Graph(BaseModel):
         return pd.DataFrame(entities), pd.DataFrame(triples)
     
 
-
-    def to_dataframe(self):
-        """Transform the graph object into a global dataframe"""
+    def to_dataframe(self) -> pd.DataFrame:
+        """
+        Transform the graph object into a global dataframe.
+        
+        Returns:
+            pd.DataFrame: A global DataFrame representing the full graph.
+        """
 
         entities, triples = self.dataframes()
         if len(entities) == 0: return pd.DataFrame()
@@ -151,9 +164,13 @@ class Graph(BaseModel):
         return df[columns]
 
 
-
-    def get_visuals(self, path: str):
-        """Generate a html file with a graph visual, and save it at the given place"""
+    def get_visuals(self, path: str) -> None:
+        """
+        Generate a html file with a graph visual, and save it at the given place
+        
+        Args:
+            path (str): the place to store the html file.
+        """
 
         graph = self.to_dataframe()
         if len(graph) == 0: return

@@ -1,6 +1,9 @@
 from typing import Optional, List
 from langchain_core.pydantic_v1 import BaseModel, Field
 
+
+# This class is to be given to a LLM.
+# Classes descriptions, attributes names, fields description should be set thoroughly.
 class Activity(BaseModel):
     """An activity made by a person."""
 
@@ -13,14 +16,25 @@ class Activity(BaseModel):
     institution: Optional[str] = Field(default=None,  description="the institution of the activity (a company, a university, a city hall, ...)")
     discipline: Optional[str] = Field(default=None, description="in case the activity is a formation, the discipline studied.")
 
+
+# This class is to be given to a LLM.
+# Class description, fields description should be set accordingly.
 class Activities(BaseModel):
     """List of activities mentioned in the context"""
 
     activities: List[Activity] = Field(default=[], description="list of all activities mentioned in the text")
 
 
+def get_activities_assertions(activities: Activities) -> List[str]:
+    """
+    Produce the assertion for Activities
+    
+    Args: 
+        activities (Activities): An object having a list of activities
 
-def get_assertions(activities: Activities):
+    Returns:
+        List[str]: the list of assertions from the given activities
+    """
 
     assertions = []
     for act in activities.activities:

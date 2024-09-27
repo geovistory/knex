@@ -1,10 +1,14 @@
-from ...extraction import Person
-from ..graph import Graph
-from ..ontology import properties as p, classes as c
+from ..schema import Graph, Person
+from ..constants import properties as p, classes as c
 
-def parse_person(person: Person, graph: Graph):
+
+def person_to_graph(person: Person, graph: Graph):
     """
     Transform an object instance into a list of entities and statements.
+
+    Args:
+        person (Person): the person to be added to the graph.
+        graph (Graph): the graph to add the person to.
     """
 
     # If the person does not have a name, set a default value
@@ -56,7 +60,6 @@ def parse_person(person: Person, graph: Graph):
         death = graph.create_entity(c.E69_death, person.name)
         graph.create_triple(death, p.P100_wasDeathOf, person_ent)
         graph.create_triple(death, p.P8_tookPlaceOnOrWithin, geoplace)
-
 
     # Parents
     if person.father_name or person.mother_name:
