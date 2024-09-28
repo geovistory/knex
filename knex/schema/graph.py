@@ -2,6 +2,7 @@ from typing import List, Tuple
 from pydantic import BaseModel
 from pyvis.network import Network
 import pandas as pd
+import pickle
 from ..constants import OntoObject, ontology as onto, properties as p, classes as c, colors
 
 
@@ -118,13 +119,15 @@ class Graph(BaseModel):
         Return the entities and triples as DataFrames.
         
         Returns:
-            Tuple[pd.DataFrame]: A tuple of length 2 with at first the entities df, and second triples df.
+            Tuple[pd.DataFrame]: A tuple of length 4 with: entities, triples, classes (ontology), properties (ontology).
         """
 
         entities = list(map(lambda entity: ({'pk': entity.pk, 'pk_class': entity.klass.pk, 'label': entity.label}), self.entities))
         triples = list(map(lambda triple: ({'subject': triple.subject.pk, 'property': triple.property.pk, 'object': triple.object.pk if isinstance(triple.object, Entity) else triple.object}), self.triples))
-
-        return pd.DataFrame(entities), pd.DataFrame(triples)
+        onto_classes = list(map(lambda cls: cls.model_dump(), onto.classes))
+        onto_properties = list(map(lambda prop: prop.model_dump(), onto.properties))
+        
+        return pd.DataFrame(entities), pd.DataFrame(triples), pd.DataFrame(onto_classes), pd.DataFrame(onto_properties)
     
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -135,7 +138,7 @@ class Graph(BaseModel):
             pd.DataFrame: A global DataFrame representing the full graph.
         """
 
-        entities, triples = self.dataframes()
+        entities, triples, _, _ = self.dataframes()
         if len(entities) == 0: return pd.DataFrame()
 
 
@@ -162,6 +165,22 @@ class Graph(BaseModel):
         df['object_class_pk'] = df['object_class_pk'].astype(pd.Int64Dtype())
 
         return df[columns]
+
+
+    def save(self, path: str):
+        """Save the current object to disk, for export"""
+        if not path.endswith('.pkl'): path += '.pkl'
+        file = open(path, 'wb')
+        pickle.dump(self, file)
+        print('Graph saved to disk')
+
+
+    @staticmethod
+    def load(path: str):
+        """Read a graph object from file"""
+        file = open(path, 'rb')
+        pickle.load(file)
+        print('Graph loaded from disk')
 
 
     def get_visuals(self, path: str) -> None:

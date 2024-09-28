@@ -4,7 +4,7 @@ help:
 	@echo "make save            -> Git add, commit, push to master (message: 'save with make command')"
 	@echo "make install         -> Clean, build and locally install the package"
 	@echo "make update-ontology -> Update the ontology file in the constant folder, according to OntoMe"
-	@echo "make llmlog          -> Launch a reverse proxy in between. Ollama base URL needs to be set to: base_url='http://127.0.0.1:5000'"
+	@echo "make llm-proxy       -> Launch a reverse proxy in between. Ollama base URL needs to be set to: base_url='http://127.0.0.1:5000'"
 
 save:
 	@git add .
