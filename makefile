@@ -32,3 +32,7 @@ update-ontology:
 
 llm-proxy:
 	@python3.10 ./scripts/reverse-proxy-llm.py
+
+
+start-gui:
+	@cd knex-gui; python3.10 -m streamlit run server.py

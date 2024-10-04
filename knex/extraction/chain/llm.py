@@ -1,9 +1,29 @@
 from langchain_ollama import ChatOllama
-
-model_name = "llama3.1"
-# ollama_base_url = "http://localhost:11434" # Direct Ollama
-ollama_base_url = "http://127.0.0.1:5000" # Through the reverse proxy
+from langchain_openai import OpenAI
 
 
 # Define the LLM used in all chains
-llm = ChatOllama(model=model_name, temperature=0, base_url=ollama_base_url)
+llm = None
+
+def init_chain_elt_llm(source: str, model: str, url: str = ''):
+    """
+    Replace the default ollama llm by another one
+
+    Args:
+        source (str): the source of the LLM: 'ollama', 'openai'
+        url (str): the url of the llm
+        model (str): the model name (eg 'llama3.1', 'gpt-4o-mini')
+    """
+    global llm
+    
+    if source == 'ollama':
+        llm = ChatOllama(model=model, temperature=0, base_url=url)
+
+    if source == 'openai':
+        llm = OpenAI(model_name=model)
+
+
+def get_chain_elt_llm():
+    """Return the LLM. Need to be instanciated first."""
+    global llm
+    return llm

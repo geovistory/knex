@@ -5,31 +5,22 @@ from gmpykit import print_object
 
 from ..schema.person import Person, get_person_assertions
 from ..constants import prompt_system_extraction
-from .chain.obj_validation import obj_validation
-from .chain.llm import llm
+from .chain.obj_validation import get_chain_elt_validation
+from .chain.llm import get_chain_elt_llm
 from .chain.verification import verify_assertions
 
 
-###################
-###### CHAIN ######
-###################
+# ----------------------------------------------------
 
-# Chain element: Parser
-parser = PydanticOutputParser(pydantic_object=Person)
-
-# Chain element: Prompt
-extracting_prompt = ChatPromptTemplate.from_messages([
-        ("system", prompt_system_extraction),
-        ("human", "What information do we know about {person_name}?")
-]).partial(format_instructions=parser.get_format_instructions())
-
-# Build the chain
-extraction_chain = extracting_prompt | llm | parser | obj_validation
+# The instance of the lang chain
+chain = None
 
 
-######################
-###### FUNCTION ######
-######################
+def init_chain_persons():
+    """Initiate the person chain"""
+    global chain, extracting_prompt, parser
+    chain = extracting_prompt | get_chain_elt_llm() | parser | get_chain_elt_validation() 
+
 
 def extract_persons(text: str, persons_names: List[str], verify: bool, verbose: bool) -> List[Person]:
     """
@@ -45,6 +36,7 @@ def extract_persons(text: str, persons_names: List[str], verify: bool, verbose: 
     Returns:
         List[Person]: The list of Person that has been found in the text
     """
+    global chain
 
     results = []
     # Extract information about all persons
@@ -52,7 +44,7 @@ def extract_persons(text: str, persons_names: List[str], verify: bool, verbose: 
 
         # Extract the information
         if verbose: print("\n==== Extracting information about:", person_name, "====")
-        person = extraction_chain.invoke({'person_name': person_name, 'text': text})
+        person = chain.invoke({'person_name': person_name, 'text': text})
         if verbose: print_object(person)
 
         # Verify extracted information
@@ -62,3 +54,16 @@ def extract_persons(text: str, persons_names: List[str], verify: bool, verbose: 
         
         results.append(person)
     return results
+
+# ----------------------------------------------------
+
+
+# Chain element: Parser
+parser = PydanticOutputParser(pydantic_object=Person)
+
+
+# Chain element: Prompt
+extracting_prompt = ChatPromptTemplate.from_messages([
+        ("system", prompt_system_extraction),
+        ("human", "What information do we know about {person_name}?")
+]).partial(format_instructions=parser.get_format_instructions())

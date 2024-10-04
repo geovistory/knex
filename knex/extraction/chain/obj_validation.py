@@ -1,5 +1,22 @@
 from langchain_core.runnables import RunnableLambda
 
+# ----------------------------------------------------
+
+chain_element = None
+
+
+def init_chain_elt_validation():
+    global chain_element
+    # Make a Langchain element
+    chain_element = RunnableLambda(__object_validation)
+
+
+def get_chain_elt_validation():
+    global chain_element
+    return chain_element
+
+# ----------------------------------------------------
+
 
 def __object_validation(obj):
     """
@@ -35,7 +52,3 @@ def __object_validation(obj):
         new_value = __object_validation(value)
         setattr(obj, key, new_value)
     return obj
-
-
-# Make a Langchain element
-obj_validation = RunnableLambda(__object_validation)

@@ -5,31 +5,22 @@ from gmpykit import print_object
 
 from ..schema import Activities, Activity, get_activities_assertions
 from ..constants import prompt_system_extraction
-from .chain.obj_validation import obj_validation
-from .chain.llm import llm
+from .chain.llm import get_chain_elt_llm
+from .chain.obj_validation import get_chain_elt_validation
 from .chain.verification import verify_assertions
 
 
-###################
-###### CHAIN ######
-###################
+# ----------------------------------------------------
 
-# Chain element: Parser
-parser = PydanticOutputParser(pydantic_object=Activities)
-
-# Chain element: Prompt
-extracting_prompt = ChatPromptTemplate.from_messages([
-        ("system", prompt_system_extraction),
-        ("human", "What information do we know about {person_name} professional activities (or formation)?")
-]).partial(format_instructions=parser.get_format_instructions())
-
-# Build the chain
-extraction_chain = extracting_prompt | llm | parser | obj_validation
+# The instance of the lang chain
+chain = None
 
 
-######################
-###### FUNCTION ######
-######################
+def init_chain_activities():
+    """Initiate the activities chain"""
+    global chain, extracting_prompt, parser
+    chain = extracting_prompt | get_chain_elt_llm() | parser | get_chain_elt_validation()
+
 
 def extract_activities(text: str, persons_names: List[str], verify: bool, verbose: bool) -> List[Activity]:
     """
@@ -45,6 +36,7 @@ def extract_activities(text: str, persons_names: List[str], verify: bool, verbos
     Returns:
         List[Activity]: The list of Activity that has been found in the text
     """
+    global chain
 
     results = []
     # Extract information about all persons
@@ -52,13 +44,26 @@ def extract_activities(text: str, persons_names: List[str], verify: bool, verbos
 
         # Extract the information
         if verbose: print("\n=== Extracting activities of:", person_name, "===")
-        activities = extraction_chain.invoke({'person_name': person_name, 'text': text})
+        activities = chain.invoke({'person_name': person_name, 'text': text})
         if verbose: print_object(activities)
 
         # Verify extracted information
         if verify:
             assertions = get_activities_assertions(activities)
-            activities = verify_assertions(text, activities, verbose)
+            activities = verify_assertions(text, assertions, verbose)
         
         results += activities.activities
     return results
+
+# ----------------------------------------------------
+
+
+# Chain element: Parser
+parser = PydanticOutputParser(pydantic_object=Activities)
+
+
+# Chain element: Prompt
+extracting_prompt = ChatPromptTemplate.from_messages([
+        ("system", prompt_system_extraction),
+        ("human", "What information do we know about {person_name} professional activities (or formation)?")
+]).partial(format_instructions=parser.get_format_instructions())

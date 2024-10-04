@@ -15,15 +15,15 @@ def relationship_to_graph(relationship: Relationship, graph: Graph):
     valid = ['romantic', 'marriage', 'friendship', 'mentorship', 'colleagues']
     if relationship.relationship_type not in valid: return
 
-    # Person involved in the relationship
-    if relationship.person1_name:
-        p1_name = relationship.person1_name
-        person1 = graph.create_entity_aial(c.E21_person, p1_name)
+    # Person involved in the relationship, if they are not present, create an "Unknown" one
+    # Person 1
+    if relationship.person1_name: p1_name = relationship.person1_name
     else: p1_name = "Unknown Person " + str(graph.get_current_index())
-    if relationship.person2_name:
-        p2_name = relationship.person2_name
-        person2 = graph.create_entity_aial(c.E21_person, p2_name)
+    person1 = graph.create_entity_aial(c.E21_person, p1_name)
+    # Person 2
+    if relationship.person2_name: p2_name = relationship.person2_name
     else: p2_name = "Unknown Person " + str(graph.get_current_index())
+    person2 = graph.create_entity_aial(c.E21_person, p2_name)
 
     # The relationship itself
     relationship_name = ' and '.join(sorted([p1_name, p2_name]))

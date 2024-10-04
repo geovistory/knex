@@ -19,6 +19,7 @@ class Ontology(BaseModel):
     def __find(self, ontoobjects: List[OntoObject], input: int | str, name=str) -> OntoObject:
         if isinstance(input, int): selection = [obj for obj in ontoobjects if input == obj.pk]
         elif isinstance(input, str): selection = [obj for obj in ontoobjects if input.lower() == obj.label.lower() or input.lower() == obj.id.lower()]
+        else: raise Exception('Given input is neither a integer nor a string')
 
         if len(selection) == 0: raise Exception(f'Unknown ' + name + ' "' + input + '"')
         elif len(selection) == 1: return selection[0]

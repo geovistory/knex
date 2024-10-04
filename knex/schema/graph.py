@@ -11,6 +11,9 @@ class Entity(BaseModel):
     klass: OntoObject
     label: str
 
+    def get_display(self):
+        return f"{self.label} ({self.klass.label} - pk{self.pk})"
+
 
 class Triple(BaseModel):
     subject: Entity
@@ -82,6 +85,18 @@ class Graph(BaseModel):
             self.triples.append(triple)
 
 
+    def delete_triple(self, pk_subject: int, pk_property: int, pk_object: int):
+        """
+        Delete a triple from the graph.
+
+        Args:
+            pk_subject (int): the pk subject 
+            pk_property (int): the pk property
+            pk_object (int): the pk_object
+        """
+        self.triples = list(filter(lambda t: t.subject.pk != pk_subject or t.property.pk != pk_property or t.object.pk != pk_object, self.triples))
+
+
     def create_entity_aial(self, pk_class: int, name: str) -> Entity:
         """
         Shortcut to create an entity and add an appellation in a language with the given name.
@@ -122,8 +137,8 @@ class Graph(BaseModel):
             Tuple[pd.DataFrame]: A tuple of length 4 with: entities, triples, classes (ontology), properties (ontology).
         """
 
-        entities = list(map(lambda entity: ({'pk': entity.pk, 'pk_class': entity.klass.pk, 'label': entity.label}), self.entities))
-        triples = list(map(lambda triple: ({'subject': triple.subject.pk, 'property': triple.property.pk, 'object': triple.object.pk if isinstance(triple.object, Entity) else triple.object}), self.triples))
+        entities = list(map(lambda entity: ({'pk': entity.pk, 'pk_class': entity.klass.pk, 'class_label': entity.klass.label, 'label': entity.label, 'display': entity.get_display()}), self.entities))
+        triples = list(map(lambda triple: ({'subject': triple.subject.pk, 'property': triple.property.pk, 'property_label': triple.property.label, 'object': triple.object.pk}), self.triples))
         onto_classes = list(map(lambda cls: cls.model_dump(), onto.classes))
         onto_properties = list(map(lambda prop: prop.model_dump(), onto.properties))
         
@@ -140,11 +155,6 @@ class Graph(BaseModel):
 
         entities, triples, _, _ = self.dataframes()
         if len(entities) == 0: return pd.DataFrame()
-
-
-        entities['class_label'] = [onto.klass(pk_class).label for pk_class in entities['pk_class']]
-        entities['display'] =  [row['class_label'] + ' - ' + row['label'] for _, row in entities.iterrows()]
-        triples['property_label'] = [onto.property(prop).label for prop in triples['property']]
 
         df = triples.merge(entities, left_on='subject', right_on='pk', how='left') \
                         .drop(columns=['pk']) \
@@ -195,8 +205,8 @@ class Graph(BaseModel):
         if len(graph) == 0: return
 
         # A bit of formating
-        graph['subject_display'] = graph['subject_display'].str.replace(' - ', '\n') 
-        graph['object_display'] = graph['object_display'].str.replace(' - ', '\n') 
+        graph['subject_display'] = graph['subject_display'].str.replace(' (', '\n(') 
+        graph['object_display'] = graph['object_display'].str.replace(' (', '\n(') 
 
         # Add node colors:
         graph['subject_color'] = [colors[klass] if pd.notna(klass) else '#000' for klass in graph['subject_class_pk']]
