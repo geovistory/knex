@@ -14,8 +14,8 @@ menu()
 # Graph source radio options
 radio_options = [
     "Load from disk (pickle file)",
-    "Generate with Knex pipeline using Ollama server",
-    "Generate with Knex pipeline using OpenAI API key",
+    "Generate using Ollama server",
+    "Generate using OpenAI API key",
 ]
 
 
@@ -24,6 +24,8 @@ radio_options = [
 def put_graph_in_session(graph):
     """This function write the given graph into the session state."""
 
+    if 'selected_entity' in st.session_state:
+        del st.session_state['selected_entity']
     st.session_state['graph'] = graph
 
     # Load the graph as dataframe (will be used for reading access and display)
@@ -56,9 +58,14 @@ if 'ollama_server_url' not in st.session_state:
 # Init State: Default value for model name
 if 'ollama_model_name' not in st.session_state:
     st.session_state['ollama_model_name'] = 'llama3.1'
+if 'openai_api_key' not in st.session_state:
+    st.session_state['openai_api_key'] = ''
+# Init State: Default value for model name
+if 'openai_model_name' not in st.session_state:
+    st.session_state['openai_model_name'] = 'gpt-4o-mini'
 # Init State: Default value for the extraction text
-if 'ollama_raw_text' not in st.session_state:
-    st.session_state['ollama_raw_text'] = ''
+if 'raw_text' not in st.session_state:
+    st.session_state['raw_text'] = ''
 
 
 # Main display of the page
@@ -75,7 +82,7 @@ st.radio(
 ### FROM DISK ###
 
 st.divider()
-if st.session_state['graph_source'] == "Load from disk (pickle file)":
+if st.session_state['graph_source'] == radio_options[0]:
 
     # If no file is loaded, allow to choose
     if 'file_name' not in st.session_state:
@@ -98,7 +105,7 @@ if st.session_state['graph_source'] == "Load from disk (pickle file)":
 
 ### FROM OLLAMA ###
 
-if st.session_state['graph_source'] == "Generate with Knex pipeline using Ollama server":
+if st.session_state['graph_source'] == radio_options[1]:
 
     # Ollama options
     col1, col2 = st.columns([5, 1])
@@ -106,26 +113,59 @@ if st.session_state['graph_source'] == "Generate with Knex pipeline using Ollama
     ollama_model_name = col2.text_input("Model name", value=st.session_state['ollama_model_name'])
 
     # The text to extract
-    ollama_raw_text = st.text_area("Raw text to extract information from:", placeholder='Write, paste a text', value=st.session_state['ollama_raw_text'])
+    raw_text = st.text_area("Raw text to extract information from:", placeholder='Write, paste a text', value=st.session_state['raw_text'], height=280)
 
     # Check if every information is present
-    if ollama_server_url and ollama_model_name and ollama_raw_text:
+    if ollama_server_url and ollama_model_name and raw_text:
 
         # Save param in memory
         st.session_state['ollama_server_url'] = ollama_server_url
         st.session_state['ollama_model_name'] = ollama_model_name
-        st.session_state['ollama_raw_text'] = ollama_raw_text
+        st.session_state['raw_text'] = raw_text
 
         # On generate button click, call the right server to extract the information and put it in session state
         if st.button("Generate graph"):
             with st.spinner(text="Extracting... (can take some minutes)"):
-                knex.init('ollama', ollama_model_name, ollama_server_url)
-                graph = knex.knowledge_extraction(ollama_raw_text, verbose=True)
-                put_graph_in_session(graph)
-                st.success('Graph extracted')
+                try:
+                    knex.init('ollama', model=ollama_model_name, url=ollama_server_url)
+                    graph = knex.knowledge_extraction(raw_text, verbose=True)
+                    put_graph_in_session(graph)
+                    st.success('Graph extracted')
+                except Exception as err:
+                    st.error(err)
 
 
 ### OPENAI ###
+
+if st.session_state['graph_source'] == radio_options[2]:
+
+    # OpenAI options
+    col1, col2 = st.columns([5, 2])
+    openai_api_key = col1.text_input("OpenAI API key", value=st.session_state['openai_api_key'])
+    openai_model_name = col2.text_input("Model name", value=st.session_state['openai_model_name'])
+
+    # The text to extract
+    raw_text = st.text_area("Raw text to extract information from:", placeholder='Write, paste a text', value=st.session_state['raw_text'], height=280)
+
+    # Check if every information is present
+    if openai_api_key and openai_model_name and raw_text:
+
+        # Save param in memory
+        st.session_state['openai_api_key'] = openai_api_key
+        st.session_state['openai_model_name'] = openai_model_name
+        st.session_state['raw_text'] = raw_text
+
+        # On generate button click, call the right server to extract the information and put it in session state
+        if st.button("Generate graph"):
+            with st.spinner(text="Extracting... (can take some minutes)"):
+                try:
+                    knex.init('openai', model=openai_model_name, api_key=openai_api_key)
+                    graph = knex.knowledge_extraction(raw_text, verbose=True)
+                    put_graph_in_session(graph)
+                    st.success('Graph extracted')
+                except Exception as err:
+                    st.error(err)
+
 
 
 st.divider()

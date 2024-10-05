@@ -16,5 +16,6 @@ def create_entity(graph):
         entity = graph.create_entity(pk_class, label)
         entity_display = entity.get_display()
         st.success(f'Entity "{entity_display}" created')
+        st.rerun()
 
 

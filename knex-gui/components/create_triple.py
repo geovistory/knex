@@ -31,5 +31,6 @@ def create_triple(entity_display_list, graph, onto_properties):
             graph.create_triple(subject_obj, pk_property, object_obj)
             # And then regenerate the graph dataframe
             st.session_state['graph_df'] = graph.to_dataframe()
+            st.success(f'Triple added to graph')
 
             st.rerun()
