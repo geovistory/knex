@@ -18,7 +18,7 @@ def init(source: str, model: str, url: str = '', api_key: str = ''):
         api_key (str): The api_key for the openai account
     """
 
-    if source == 'openai':
+    if source == 'openai' and api_key:
         os.environ['OPENAI_API_KEY'] = api_key
 
     init_chain_elt_llm(source, model, url)

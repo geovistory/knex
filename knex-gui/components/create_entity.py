@@ -12,7 +12,7 @@ def create_entity(graph):
     label = col2.text_input("Label:", placeholder='Set the label')
     if col3.button('✅', type='primary', key='create-entity'): 
         # Get pk class
-        pk_class = int(onto_classes[onto_classes['display'] == class_display]['pk'])
+        pk_class = int(onto_classes[onto_classes['display'] == class_display].iloc[0]['pk'])
         entity = graph.create_entity(pk_class, label)
         entity_display = entity.get_display()
         st.success(f'Entity "{entity_display}" created')

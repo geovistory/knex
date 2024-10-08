@@ -61,7 +61,9 @@ else:
             if entity_display in entity_display_list:
                 st.session_state['selected_entity'] = entity_display
             # Else inform that there is nothing for this entity
-            else: st.write('This entity has no more triples in the graph')
+            else: 
+                st.session_state['selected_entity'] = entity_display
+                st.write('This entity has no more triples in the graph')
     st.write('')
     st.markdown('---')
 
@@ -85,7 +87,7 @@ else:
 
 
         # Select the lvl 1 graph for the entity
-        selected_graph = graph_df[(graph_df['subject_display'] == selected_display) | (graph_df['object_display'] == selected_display)]
+        selected_graph = graph_df[(graph_df['subject_display'] == selected_display) | (graph_df['object_display'] == selected_display)].copy()
         selected_graph.sort_values(['property'], inplace=True)
 
 

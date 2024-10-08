@@ -1,5 +1,6 @@
+import os
 from langchain_ollama import ChatOllama
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 
 
 # Define the LLM used in all chains
@@ -20,7 +21,7 @@ def init_chain_elt_llm(source: str, model: str, url: str = ''):
         llm = ChatOllama(model=model, temperature=0, base_url=url)
 
     if source == 'openai':
-        llm = OpenAI(model_name=model)
+        llm = ChatOpenAI(model=model, temperature=0, api_key=os.getenv('OPENAI_API_KEY'))
 
 
 def get_chain_elt_llm():

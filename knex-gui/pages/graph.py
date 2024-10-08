@@ -62,7 +62,7 @@ if 'openai_api_key' not in st.session_state:
     st.session_state['openai_api_key'] = ''
 # Init State: Default value for model name
 if 'openai_model_name' not in st.session_state:
-    st.session_state['openai_model_name'] = 'gpt-4o-mini'
+    st.session_state['openai_model_name'] = 'gpt-4o'
 # Init State: Default value for the extraction text
 if 'raw_text' not in st.session_state:
     st.session_state['raw_text'] = ''
@@ -184,6 +184,7 @@ if 'graph' in st.session_state:
             if 'graph_df' in st.session_state: del st.session_state['graph_df']
             if 'onto_classes' in st.session_state: del st.session_state['onto_classes']
             if 'onto_properties' in st.session_state: del st.session_state['onto_properties']
+            if 'selected_entity_history' in st.session_state: del st.session_state['selected_entity_history']
             st.session_state['clear_count'] = 0
             st.rerun()
 

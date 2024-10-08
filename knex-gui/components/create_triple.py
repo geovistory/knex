@@ -9,7 +9,7 @@ def create_triple(entity_display_list, graph, onto_properties):
     col1, col2, col3, col4 = st.columns([10, 10, 10, 1], vertical_alignment='bottom')
     new_subject = col1.selectbox("Subject", entity_display_list, index=None, placeholder='Choose a subject')
     new_property = col2.selectbox("Property", st.session_state['onto_properties']['display'], index=None, placeholder='Choose a property')
-    new_object = col3.selectbox("Object", entity_display_list, index=None, placeholder='Choose a object')
+    new_object = col3.selectbox("Object", entity_display_list, index=None, placeholder='Choose an object')
 
     # When new triple is validated
     if col4.button('✅', type='primary', key='create-triple'): 

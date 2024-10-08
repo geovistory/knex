@@ -26,7 +26,7 @@ def get_graph_depth(entity_display, depth):
         entities_to_fetch += selection['subject_display'].tolist()
         entities_to_fetch += selection['object_display'].tolist()
         entities_to_fetch = list(np.unique(entities_to_fetch))
-    return selection
+    return selection.copy()
 
 # -------------------------------
 
