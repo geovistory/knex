@@ -12,4 +12,4 @@ menu()
 
 st.write('Export your data in a Geovistory project to perpetuate and make the data LOD and FAIR')
 
-st.write('Coming soon')
+st.write('Not yet developed')

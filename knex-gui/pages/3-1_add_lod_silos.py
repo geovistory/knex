@@ -12,6 +12,6 @@ init()
 menu()
 
 
-st.write("Reconcile your data with Geovistory data")
+st.write("Add data from external LOD silos (Wikidata, DBpedia, ...)")
 
-st.write('Coming soon')
+st.write('Not yet developed')

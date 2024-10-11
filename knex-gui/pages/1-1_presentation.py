@@ -17,7 +17,7 @@ st.markdown('# What it is')
 st.markdown('''
 Knex is a Python library which intends to extract knowledge information from raw texts.
             
-It is developed by the [Digital History department of the university of Bern](https://www.dh.unibe.ch/) and by [KleioLab](https://kleiolab.ch/) for the [Geovistory](https://www.geovistory.org/) project.
+It is developed by the [Digital History department of the university of Bern](https://www.dh.unibe.ch/) and by [KleioLab](https://kleiolab.ch/) for the [Geovistory](https://www.geovistory.org/) and LOD4HSS project.
 ''')
 
 
@@ -30,5 +30,5 @@ Then, in a second step, those instances are transformed in modeled data respecti
 
 The final result is reshaped in form of a graph, which make it easier to use, edit, display, ... In short, work with.
             
-Also, to make the data LOD and FAIR, it is possible to reconcile them against Geovistory data, but also to import them.
+Also, to make the data LOD and FAIR, it is possible to first add open data from LOD silos like DBpedia and Wikidata, and then reconcile them against Geovistory data, in order to import them.
 ''')

@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import geovpylib.database as db
 from components.init import init
 from components.menu import menu
 
@@ -11,6 +12,6 @@ init()
 menu()
 
 
-st.write('Speak with your data with this RAG chat bot')
+st.write("Reconcile your data with Geovistory data")
 
 st.write('Not yet developed')

@@ -18,7 +18,7 @@ def get_chain_elt_validation():
 # ----------------------------------------------------
 
 
-def __object_validation(obj):
+def __object_validation(obj) -> object:
     """
     This function is made to be transformed into a LangChain Runnable.
     It checks if data extracted by the LLM is valid (eg not "Unknown")
