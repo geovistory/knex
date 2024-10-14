@@ -1,5 +1,5 @@
 
-- allow usage of openai chatgpt
+- Make a RAG on the graph
 - pour into a sparql endpoint
 - import in GV
 - Record linkage

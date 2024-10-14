@@ -13,7 +13,7 @@ menu()
 
 st.title('HLS persons')
 
-hls_persons = pd.read_csv('./hls_persons.csv')
+hls_persons = pd.read_csv('./data/hls_persons')
 
 st.markdown(f'''
 This page regroup {len(hls_persons)} texts of persons extracted and reformated from the [HLS base](https://hls-dhs-dss.ch/).

@@ -1,6 +1,4 @@
-import pandas as pd
 import streamlit as st
-import geovpylib.database as db
 from components.init import init
 from components.menu import menu
 

@@ -1,4 +1,6 @@
-from typing import List
+import pandas as pd
+from typing import List, Tuple
+import numbers
 from pydantic import BaseModel, Field
 
 class OntoObject(BaseModel):
@@ -17,13 +19,22 @@ class Ontology(BaseModel):
         return self.__find(self.properties, input, 'property')
 
     def __find(self, ontoobjects: List[OntoObject], input: int | str, name=str) -> OntoObject:
-        if isinstance(input, int): selection = [obj for obj in ontoobjects if input == obj.pk]
+        if isinstance(input, numbers.Integral): selection = [obj for obj in ontoobjects if input == obj.pk]
         elif isinstance(input, str): selection = [obj for obj in ontoobjects if input.lower() == obj.label.lower() or input.lower() == obj.id.lower()]
         else: raise Exception('Given input is neither a integer nor a string')
 
         if len(selection) == 0: raise Exception(f'Unknown ' + name + ' "' + input + '"')
         elif len(selection) == 1: return selection[0]
         else: raise Exception('Multiple ' + name + ' found with "' + input + '"')
+
+    def to_dataframes(self) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        classes_df = pd.DataFrame(list(map(lambda cls: cls.model_dump(), self.classes)))
+        classes_df['display'] = classes_df['label'] + ' (' + classes_df['id'] + ')'
+
+        properties_df = pd.DataFrame(list(map(lambda property: property.model_dump(), self.properties)))
+        properties_df['display'] = properties_df['label'] + ' (' + properties_df['id'] + ')'
+        
+        return classes_df, properties_df
 
 ontology = Ontology()
 ontology.classes.append(OntoObject(pk=7, label="Activity", id="E7"))

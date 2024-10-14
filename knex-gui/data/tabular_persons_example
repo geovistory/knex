@@ -1,0 +1,4 @@
+﻿name,gender,origins,religion,birth_date,birth_place,death_date,death_place,father_name,mother_name
+John Doe,Male,France,Christian,1985.06.15,Berlin,2023.03.12,Munich,Robert Doe,Anna Doe
+Jane Smith,Female,China,Buddhist,1990.11.23,Tokyo,2075.09.01,Kyoto,Kenji Smith,Yuki Smith
+Carlos Garcia,Male,Germany,Catholic,1972.02.10,Madrid,2050.08.19,Seville,Miguel Garcia,Lucia Garcia
