@@ -17,7 +17,8 @@ def menu():
     st.sidebar.markdown('## LOD')
     st.sidebar.page_link('pages/3-1_add_lod_silos.py', label="Add data from LOD silos")
     st.sidebar.page_link('pages/3-2_reconciliation.py', label="Identify Geovistory entities")
-    st.sidebar.page_link('pages/3-3_export.py', label="Export to Geovistory")
+    st.sidebar.page_link('pages/3-3_export-gv.py', label="Export to Geovistory")
+    st.sidebar.page_link('pages/3-4_export_sparql.py', label="Export to a SPARQL endpoint")
     
     st.sidebar.divider()
 

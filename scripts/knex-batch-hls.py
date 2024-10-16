@@ -8,15 +8,17 @@ from datetime import datetime
 knex_nb = 100
 
 eta = kit.Eta()
-knex.init('openai', 'gpt-4o')
+# knex.init('openai', 'gpt-4o') # Commented out to avoid mistake run
 # knex.init('ollama', 'llama3.1', 'http://localhost:11434')
 # knex.init('ollama', 'llama3.1', 'http://127.0.0.1:5000')
 db.connect_yellow('switzerland_and_beyond')
 
 
+# Read HLS notices from Yellow and extract some of them
 table = db.query('select url, name, notice from hls.person')
 texts = table.sample(knex_nb).copy()
 
+# Edit the notices
 texts['notice'] = texts['name'] + ':\n' + texts['notice']
 texts.reset_index(inplace=True, drop=True)
 
@@ -54,6 +56,8 @@ with get_openai_callback() as cb:
     eta.end()
     end_time = datetime.now()
 
+
+    # Report: what has been done
     print()
     print(f'FOR {len(texts)} PERSONS:')
     print(f"Total Tokens: {kit.readable_number(cb.total_tokens)}")
@@ -61,6 +65,8 @@ with get_openai_callback() as cb:
     print(f"Completion Tokens: {kit.readable_number(cb.completion_tokens)}")
     print(f"Total Cost (USD): ${cb.total_cost}")
     print(f"Total execution time: {end_time - begin_time}")
+
+    # Report: average for 1 person
     print()
     print('AVERAGE FOR 1 PERSON')
     print(f"Total Tokens: {kit.readable_number(cb.total_tokens / len(texts))}")
@@ -69,11 +75,11 @@ with get_openai_callback() as cb:
     print(f"Total Cost (USD): ${cb.total_cost / len(texts)}")
     print(f"Total execution time: {(end_time - begin_time) / len(texts)}")
     print()
+
+    # Report: estimation for the full HLS
     print(f'ESTIMATION FOR ALL HLS PERSONS ({len(table)})')
     print(f"Total Tokens: {kit.readable_number((cb.total_tokens / len(texts)) * len(table))}")
     print(f"Prompt Tokens: {kit.readable_number((cb.prompt_tokens / len(texts)) * len(table))}")
     print(f"Completion Tokens: {kit.readable_number((cb.completion_tokens / len(texts)) * len(table))}")
     print(f"Total Cost (USD): ${(cb.total_cost / len(texts)) * len(table)}")
     print(f"Total execution time: {((end_time - begin_time) / len(texts)) * len(table)}")
-    
-kit.readable_number
