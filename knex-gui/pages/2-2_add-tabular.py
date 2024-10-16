@@ -19,7 +19,7 @@ graph: Graph = st.session_state['graph']
 
 
 # Title
-st.title('Load tabular data')
+st.title('Add tabular data')
 st.markdown('You can transform into a graph special tabular data (as long as they respect the required format).')
 st.markdown('The spreadsheet can have additional columns, but they will be ignored.')
 st.markdown('If the table is missing a required column, it will be treated as empty.')
