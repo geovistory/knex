@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "knex"
+version = "1.1.0"
+description = "KNowledge EXtraction package, part of the Knex pipeline"
+authors = ["Gaétan Muck <gaetan.muck@kleiolab.ch>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

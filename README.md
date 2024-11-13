@@ -1,6 +1,14 @@
 # Knex - Knowledge Extraction
 
-___
+
+## Get Started
+
+1. Download this repo: `git clone https://github.com/kleiolab/knex.git`
+2. Jump in the downloaded folder: `cd knex`
+3. Install dependencies: `make install`
+4. Read this `README.md`
+5. 
+
 
 ## Introduction
 
@@ -9,8 +17,6 @@ Knex is a project that aims to extract information from raw text and model it in
 The current version consists of two parts:
 - A Python library that "does the work", allowing developers to extract information from text, process corpora, run batches, etc.
 - A web GUI that embeds the Python library, enabling non-developers to do the same, but also to visualize results, edit the graph, and manage it (reconcile, upload, fetch other data, etc.).
-
-___
 
 ## Part 1: The Python Library and How It Works
 
@@ -39,7 +45,6 @@ Each property path must be manually developed (unfold) using the ontology and th
 
 Once these property paths are expanded, everything can be placed in a graph (entities + triples), which can then be exported as a spreadsheet (CSV), as interactive graph visualizations, or even merged with multiple graphs.
 
-___
 
 ## Part 2: The GUI and Its Features
 
@@ -52,7 +57,6 @@ It is divided into three main sections:
 
 An additional section provides sample data for the user: a list of all cleaned records from the HLS.
 
-___
 
 ## Future Features
 
@@ -75,13 +79,12 @@ Because Knex could work well with the LORD tool, here are some feature ideas for
 - Interact with data via a RAG: Since the loaded data may be relatively small, a RAG (Retrieval-Augmented Generation) could be applied, allowing users to interact with the data. The utility of this feature within the Knex GUI is debatable, so it may be more appropriate for the LORD tool.
 - Store the graph in a database: Since the data is relatively simple (ontology, entities, and triples), it could be stored in a database (e.g., PostgreSQL) instead of in memory, allowing for embeddings and potential reconciliation. This idea needs further consideration and may be more suitable for the LORD tool.
 
-___
 
 ## Version History
 
 ### v0:
 
-POC using LLM to extract atomic assertions from texts and applying classic NLP on those assertions to build the graph.
+POC using LLM to extract atomic assertions from texts and applying classic NLP on those assertions to build the graph. Was based on prompt engineering and spaCy.
 
 ### v1 (current version):
 

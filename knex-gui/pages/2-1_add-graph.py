@@ -151,7 +151,9 @@ if st.button('Clear graph'):
         # Clear the remaining state
         del st.session_state['selected_entity']
         del st.session_state['clear_count']
+        paths = None
         del paths
+        if 'selected_entity_history' in st.session_state: del st.session_state['selected_entity_history']
         st.rerun()
 
 
@@ -161,5 +163,5 @@ if st.button('Download graph'):
     now = datetime.now()
     graph: Graph = st.session_state['graph']
     col1, col2 = st.columns([5, 2], vertical_alignment="bottom")
-    file_name = col1.text_input('File name', value=f"graph_{now.strftime('%Y-%m-%d_%H:%M:%S')}.pkl")
+    file_name = col1.text_input('File name', value=f"graph_{now.strftime('%Y-%m-%d_%H:%M:%S')}.csv")
     col2.download_button("Export graph", data=graph.to_dataframe().to_csv(index=False).encode('utf-8'), file_name=file_name)
