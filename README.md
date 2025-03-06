@@ -7,7 +7,7 @@
 2. Jump in the downloaded folder: `cd knex`
 3. Install dependencies: `make install`
 4. Read this `README.md`
-5. 
+5. Start the gui (optional) `make start-gui`
 
 
 ## Introduction
