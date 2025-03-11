@@ -1,8 +1,11 @@
 from typing import List, Tuple
 from pydantic import BaseModel
 from pyvis.network import Network
-import pandas as pd, numpy as np
-import pickle
+import pandas as pd
+import time
+import hashlib
+import geovpylib.sparql as sparql
+import uuid
 from ..constants import OntoObject, ontology as onto, properties as p, classes as c, colors
 
 
@@ -10,6 +13,7 @@ class Entity(BaseModel):
     pk: int
     klass: OntoObject
     label: str
+    uuid: str = None
 
     def get_display(self):
         return f"{self.label} ({self.klass.label} - pk{self.pk})"
@@ -37,6 +41,15 @@ class Graph(BaseModel):
             int: The pk given to the next entity.
         """
         return self.pk_index
+    
+    
+    def set_current_index(self, index) -> None:
+        """
+        Set the value of the index to a value.
+        This is usefull for instance when running batch:
+        on an iteration to make the index at the max value of the previous iteration.
+        """
+        self.pk_index = index
 
 
     def get_entity(self, pk: int) -> Entity | None:
@@ -308,3 +321,35 @@ class Graph(BaseModel):
         entities = list(map(lambda pk: self.get_entity(pk), entities_to_fetch))
 
         return Graph(entities=entities, triples=selection)
+    
+
+    def to_sparql(self, sparql_url, graph_uri, base_uri, username=None, password=None):
+
+        # Create hashs for each entities
+        for entity in self.entities:
+            label = f"{int(time.time() * 1000)}-{entity.pk}-{entity.klass.pk}-{entity.label}"
+            entity.uuid = uuid.uuid5(uuid.NAMESPACE_DNS, label)
+            print(f"UUID generated: {label} - {entity.uuid}")
+            time.sleep(0.001)
+
+        inserts = []
+        inserts.append('PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>')
+        inserts.append('PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>')
+        inserts.append('PREFIX ontome: <https://ontome.net/ontology/>')
+        inserts.append('PREFIX base: <' + base_uri + '>')
+        inserts.append('INSERT DATA {')
+        inserts.append('GRAPH <' + graph_uri + '> {')
+
+        for entity in self.entities:
+            inserts.append(f"base:{entity.uuid} rdf:type ontome:c{entity.klass.pk} .")
+            label = entity.label.replace("\'", "\\'")
+            inserts.append(f"base:{entity.uuid} rdfs:label '{label}' .")
+
+        for triple in self.triples:
+            inserts.append(f"base:{triple.subject.uuid} ontome:p{triple.property.pk} base:{triple.object.uuid} .")
+
+        inserts.append('}')
+        inserts.append('}')
+
+        sparql.connect_external(sparql_url, username, password)
+        sparql.execute('\n'.join(inserts))
