@@ -52,9 +52,6 @@ Structure:
 
 ## Dependencies
 
-For usability, and to avoid code duplication, this package depends on *spaCy*, for all the NLP parts, and on *gmpykit* which is the developer personal library for redundant Python code. It is publicly available on Pypi (https://pypi.org/project/gmpykit/)
-
-
 ## How to use (Library API):
 
 **Extract graph from a text**

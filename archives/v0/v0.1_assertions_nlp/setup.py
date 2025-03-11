@@ -9,7 +9,6 @@ setup(
     long_description='Extract Knowledge from raw text an return a graph.',
     packages=find_packages(),
     install_requires=[
-        "gmpykit",
         "spacy"
     ],
     keywords=['knowledge', 'extraction', 'graph']

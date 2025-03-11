@@ -1,7 +1,6 @@
 from typing import List
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from gmpykit import print_object
 
 from ..schema import Activities, Activity, get_activities_assertions
 from ..constants import prompt_system_extraction
@@ -9,6 +8,26 @@ from .chain.llm import get_chain_elt_llm
 from .chain.obj_validation import get_chain_elt_validation
 from .chain.verification import verify_assertions
 
+
+# ----------------------------------------------------
+
+def print_object(obj, heading="", key=""):
+    """Print out an object with indentation."""
+
+    if isinstance(obj, str) or isinstance(obj, int) or isinstance(obj, bool):
+        print(heading + key + ": " + str(obj))
+
+    elif isinstance(obj, list):
+        for i, elt in enumerate(obj):
+            print(heading + key + " " + str(i) + ": ")
+            print_object(elt, heading + "    ")
+
+    elif isinstance(obj, dict):
+        for key, value in obj.items():
+            print_object(heading=heading, key=key, obj=value)
+
+    elif obj:
+        print_object(obj.__dict__, heading)
 
 # ----------------------------------------------------
 

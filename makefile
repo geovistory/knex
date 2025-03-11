@@ -15,7 +15,6 @@ save:
 
 
 install:
-	@cd ..; git clone https://github.com/gaetanmuck/gmpykit.git
 	@poetry install
 
 

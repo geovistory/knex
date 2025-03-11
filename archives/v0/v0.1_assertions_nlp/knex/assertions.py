@@ -1,5 +1,5 @@
 import math
-import gmpykit as kit
+import kit
 from knex.constants.prompt import prompt
 
 
@@ -17,7 +17,7 @@ def get_assertions(raw_text: str, ollama_url='http://localhost:11434/api/generat
     loc_prompt = prompt + f'\n\nText: "{raw_text}"'
 
     # Ask the LLM
-    llm_answer = kit.ask_llm(loc_prompt, ollama_url, model_name)
+    llm_answer = kit.ask_ollama(loc_prompt, ollama_url, model_name)
     llm_answer = llm_answer.replace('\n\n', '')
 
     # Adapt LLM answer: remove head of the line like "1. blahblah"
@@ -32,7 +32,7 @@ def get_assertions(raw_text: str, ollama_url='http://localhost:11434/api/generat
 def get_assertion_large_text(raw_text: str, ollama_url='http://localhost:11434/api/generate', model_name='llama3', chunk_size=1000, overlap_size=200):
 
     # Get the main subject of the text
-    main_subject = kit.ask_llm(f'Who or what is the main subject of the following text: "{raw_text}". Answer with the sentence: "The text is about [REPLACE]".')
+    main_subject = kit.ask_ollama(f'Who or what is the main subject of the following text: "{raw_text}". Answer with the sentence: "The text is about [REPLACE]".')
 
     # Split the large text into pieces
     pieces_nb = math.ceil(len(raw_text) / chunk_size)
