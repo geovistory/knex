@@ -2,7 +2,7 @@ import streamlit as st
 
 def menu():
     st.sidebar.markdown('## KNEX GUI')
-    st.sidebar.page_link('pages/1-1_presentation.py', label="Presentation")
+    # st.sidebar.page_link('pages/1-1_presentation.py', label="Presentation")
     st.sidebar.page_link('pages/1-2_extracted-data.py', label="Extracted data")
 
 

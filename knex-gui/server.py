@@ -1,4 +1,3 @@
 import streamlit as st
-import knex
 
-st.switch_page("pages/1-1_presentation.py")
+st.switch_page("pages/1-2_extracted-data.py")

@@ -12,9 +12,8 @@ help:
 	@echo "make llm-proxy       -> Launch a reverse proxy in between. Ollama base URL needs to be set to: base_url='http://127.0.0.1:5000'"
 	@echo "make start-gui       -> Start a Streamlit app with the Knex GUI"
 
-
 install:
-	@poetry install
+	$(PYTHON) -m pip install streamlit 
 
 
 llm-proxy:

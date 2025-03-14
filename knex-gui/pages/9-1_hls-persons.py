@@ -13,12 +13,18 @@ menu()
 
 st.title('HLS persons')
 
-hls_persons = pd.read_csv('./data/hls_persons')
+hls_persons = pd.read_csv('./data/hls_persons')[0:100]
+
+# st.markdown(f'''
+# This page regroup {len(hls_persons)} texts of persons extracted and reformated from the [HLS base](https://hls-dhs-dss.ch/).
+
+# They are available here in order to easily test the Knex tool: take someone from the list, copy the text, and insert it in the [Knowledge Extraction / Graph](/1_add-graph) page to get the extracted graph.
+# ''')
 
 st.markdown(f'''
-This page regroup {len(hls_persons)} texts of persons extracted and reformated from the [HLS base](https://hls-dhs-dss.ch/).
+This page regroup 100 texts of persons extracted and reformated from the [HLS base](https://hls-dhs-dss.ch/).
 
-They are available here in order to easily test the Knex tool: take someone from the list, copy the text, and insert it in the [Knowledge Extraction / Graph](/graph) page to get the extracted graph.
+They are available here in order to easily test the Knex tool: take someone from the list, copy the text, and insert it in the [Knowledge Extraction / Graph](/1_add-graph) page to get the extracted graph.
 ''')
 
 person = st.selectbox("Look for a person", hls_persons['name'].tolist(), index=None)
